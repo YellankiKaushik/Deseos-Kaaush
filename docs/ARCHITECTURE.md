@@ -15,7 +15,7 @@ AspireList is a TanStack Start application generated from Lovable and kept on th
 - Supabase Auth handles email/password sessions.
 - Google OAuth is routed through Lovable Cloud Auth in `src/integrations/lovable/index.ts`.
 - Product URL extraction runs as a TanStack Start server function in `src/lib/extract.functions.ts` with server-only parsing in `src/lib/extract.server.ts`.
-- Secure auth-account deletion is implemented as a server function in `src/lib/account.functions.ts` and requires `SUPABASE_SERVICE_ROLE_KEY`.
+- Secure auth-account deletion is implemented as a server function in `src/lib/account.functions.ts` and requires `SUPABASE_SECRET_KEY`, with `SUPABASE_SERVICE_ROLE_KEY` supported only as a deprecated legacy fallback.
 
 ## Storage
 
@@ -25,4 +25,4 @@ The browser uploads through the authenticated Supabase client and reads images t
 
 ## Deployment Shape
 
-The Vite config uses `@lovable.dev/vite-tanstack-config`, which includes TanStack Start, React, Tailwind, path aliases, and Nitro. The current build emits a Cloudflare-oriented Nitro output by default, but the source is portable to any host that can run the TanStack Start/Nitro output with the required environment variables.
+The Vite config uses `@lovable.dev/vite-tanstack-config`, which includes TanStack Start, React, Tailwind, path aliases, and Nitro. Normal production builds are pinned to Nitro's Vercel preset, while Lovable sandbox builds may still force Lovable's Cloudflare output internally.
