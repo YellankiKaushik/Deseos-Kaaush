@@ -12,6 +12,12 @@ import {
   totalsByCurrency,
 } from "@/lib/aspire";
 import { backupRowCounts, itemsToCsv, parseBackup } from "@/lib/backup";
+import { imageCandidatesFromHtml } from "@/lib/extract.server";
+import {
+  fetchRemoteImage,
+  imageImportFallbackResult,
+  RemoteImageImportError,
+} from "@/lib/image-import.server";
 import { itemPayload } from "@/lib/item-payload";
 
 describe("normalizeUrl", () => {
@@ -173,5 +179,105 @@ describe("ItemForm", () => {
     );
     expect(screen.getByLabelText(/Purchase date/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Actual price paid/i)).toBeInTheDocument();
+  });
+});
+
+describe("product image extraction", () => {
+  it("reads a JSON-LD string image", () => {
+    const images = imageCandidatesFromHtml(
+      `<script type="application/ld+json">{"@type":"Product","name":"Lamp","image":"https://cdn.example.com/lamp.jpg"}</script>`,
+      "https://shop.example.com/item",
+    );
+    expect(images[0]?.url).toBe("https://cdn.example.com/lamp.jpg");
+  });
+
+  it("reads a JSON-LD array image", () => {
+    const images = imageCandidatesFromHtml(
+      `<script type="application/ld+json">{"@type":"Product","image":["/small.jpg","/large.jpg"]}</script>`,
+      "https://shop.example.com/item",
+    );
+    expect(images.map((image) => image.url)).toContain("https://shop.example.com/small.jpg");
+    expect(images.map((image) => image.url)).toContain("https://shop.example.com/large.jpg");
+  });
+
+  it("reads a JSON-LD object image", () => {
+    const images = imageCandidatesFromHtml(
+      `<script type="application/ld+json">{"@type":"Product","image":{"contentUrl":"//cdn.example.com/object.webp"}}</script>`,
+      "https://shop.example.com/item",
+    );
+    expect(images[0]?.url).toBe("https://cdn.example.com/object.webp");
+  });
+
+  it("falls back to og:image", () => {
+    const images = imageCandidatesFromHtml(
+      `<meta property="og:image" content="https://cdn.example.com/og.png">`,
+      "https://shop.example.com/item",
+    );
+    expect(images[0]?.url).toBe("https://cdn.example.com/og.png");
+  });
+
+  it("normalizes a relative image URL", () => {
+    const images = imageCandidatesFromHtml(
+      `<meta itemprop="image" content="../images/product.jpg">`,
+      "https://shop.example.com/products/item",
+    );
+    expect(images[0]?.url).toBe("https://shop.example.com/images/product.jpg");
+  });
+
+  it("rejects invalid and private image URLs", () => {
+    expect(
+      imageCandidatesFromHtml(
+        `<meta property="og:image" content="http://127.0.0.1/private.jpg">`,
+        "https://shop.example.com/item",
+      ),
+    ).toEqual([]);
+  });
+
+  it("chooses a suitable srcset candidate from image heuristics", () => {
+    const images = imageCandidatesFromHtml(
+      `<img class="product-main" srcset="/tiny.jpg 200w, /large.jpg 1200w" src="/fallback.jpg" width="600" height="600">`,
+      "https://shop.example.com/item",
+    );
+    expect(images[0]?.url).toBe("https://shop.example.com/large.jpg");
+  });
+});
+
+describe("remote image import validation", () => {
+  it("rejects non-image Content-Type", async () => {
+    await expect(
+      fetchRemoteImage("https://cdn.example.com/image", {
+        fetchImpl: async () =>
+          new Response("<html></html>", { headers: { "content-type": "text/html" } }),
+      }),
+    ).rejects.toThrow(/JPEG, PNG, or WebP/);
+  });
+
+  it("rejects oversized images", async () => {
+    await expect(
+      fetchRemoteImage("https://cdn.example.com/image.jpg", {
+        maxBytes: 4,
+        fetchImpl: async () =>
+          new Response(new Uint8Array([1, 2, 3, 4, 5]), {
+            headers: { "content-type": "image/jpeg" },
+          }),
+      }),
+    ).rejects.toThrow(/larger than the storage limit/);
+  });
+
+  it("returns a non-throwing fallback result when remote import fails", () => {
+    const result = imageImportFallbackResult(
+      "https://cdn.example.com/image.jpg",
+      ["old warning"],
+      new RemoteImageImportError(
+        "unsupported_image_type",
+        "The extracted image is not a JPEG, PNG, or WebP file.",
+      ),
+    );
+    expect(result).toEqual({
+      ok: false,
+      storagePath: null,
+      sourceUrl: "https://cdn.example.com/image.jpg",
+      warnings: ["old warning", "The extracted image is not a JPEG, PNG, or WebP file."],
+    });
   });
 });
