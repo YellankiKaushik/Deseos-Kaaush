@@ -2,12 +2,19 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Search, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
@@ -29,7 +36,13 @@ import {
   numberOrNull,
   requireUserId,
 } from "@/lib/queries";
-import { formatMoney, totalsByCurrency } from "@/lib/aspire";
+import {
+  formatMoney,
+  itemMatchesSearch,
+  sortItems,
+  totalsByCurrency,
+  type SortValue,
+} from "@/lib/aspire";
 
 export const Route = createFileRoute("/_authenticated/collections/$id")({
   head: () => ({
@@ -69,6 +82,8 @@ function CollectionDetail() {
   const [description, setDescription] = useState("");
   const [targetDate, setTargetDate] = useState("");
   const [targetBudget, setTargetBudget] = useState("");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortValue>("newest");
 
   useEffect(() => {
     if (!collection) return;
@@ -154,7 +169,10 @@ function CollectionDetail() {
 
   const memberIds = new Set(memberQuery.data ?? []);
   const allItems = itemsQuery.data ?? [];
-  const items = allItems.filter((item) => memberIds.has(item.id));
+  const items = sortItems(
+    allItems.filter((item) => memberIds.has(item.id) && itemMatchesSearch(item, search)),
+    sort,
+  );
   const totals = totalsByCurrency(items);
   const budget = collection.target_budget != null ? Number(collection.target_budget) : null;
 
@@ -254,6 +272,31 @@ function CollectionDetail() {
           </AlertDialog>
         </div>
       </form>
+
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_220px]">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search this collection"
+            className="pl-9"
+          />
+        </div>
+        <Select value={sort} onValueChange={(value) => setSort(value as SortValue)}>
+          <SelectTrigger aria-label="Sort collection">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="newest">Newest</SelectItem>
+            <SelectItem value="oldest">Oldest</SelectItem>
+            <SelectItem value="price_asc">Price: low to high</SelectItem>
+            <SelectItem value="price_desc">Price: high to low</SelectItem>
+            <SelectItem value="priority">Priority</SelectItem>
+            <SelectItem value="target_date">Target date</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {items.length ? (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
