@@ -14,11 +14,11 @@ AspireList is a private personal wishlist and purchase-planning app. Save items 
 
 ```bash
 npm install
-cp .env.example .env
+cp .env.example .env.local
 npm run dev
 ```
 
-Set the Supabase values in `.env`. The browser may use only the `VITE_SUPABASE_*` public values. Keep `SUPABASE_SERVICE_ROLE_KEY` server-only.
+Set the Supabase values in `.env.local`. The browser may use only the `VITE_SUPABASE_*` public values. Keep `SUPABASE_SECRET_KEY` server-only.
 
 ## Scripts
 
@@ -40,8 +40,9 @@ npm run preview
 | `VITE_SUPABASE_PROJECT_ID`      | frontend public | Lovable compatibility/project metadata            |
 | `SUPABASE_URL`                  | server          | Supabase project API URL for server functions     |
 | `SUPABASE_PUBLISHABLE_KEY`      | server          | Public key used by authenticated server functions |
-| `SUPABASE_SERVICE_ROLE_KEY`     | server secret   | Account deletion and privileged maintenance only  |
 | `SUPABASE_PROJECT_ID`           | optional        | Lovable compatibility/project metadata            |
+| `SUPABASE_SECRET_KEY`           | server secret   | Account deletion and privileged maintenance only  |
+| `SUPABASE_SERVICE_ROLE_KEY`     | server secret   | Deprecated legacy fallback                        |
 
 ## Documentation
 
