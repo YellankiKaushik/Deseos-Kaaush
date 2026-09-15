@@ -76,3 +76,32 @@ export async function signedImageUrl(path: string) {
   if (error) throw error;
   return data.signedUrl;
 }
+
+export async function syncItemImageMetadata({
+  userId,
+  itemId,
+  storagePath,
+  sourceUrl,
+  altText,
+}: {
+  userId: string;
+  itemId: string;
+  storagePath: string | null;
+  sourceUrl: string | null;
+  altText: string;
+}) {
+  const { error: deleteError } = await supabase.from("item_images").delete().eq("item_id", itemId);
+  if (deleteError) throw deleteError;
+
+  if (!storagePath && !sourceUrl) return;
+
+  const { error } = await supabase.from("item_images").insert({
+    item_id: itemId,
+    user_id: userId,
+    storage_path: storagePath,
+    source_url: sourceUrl,
+    alt_text: altText,
+    position: 0,
+  });
+  if (error) throw error;
+}
