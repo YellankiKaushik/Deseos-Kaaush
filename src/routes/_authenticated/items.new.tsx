@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ItemForm, emptyItemForm, type ItemFormValues } from "@/components/item-form";
-import { extractProduct } from "@/lib/extract.functions";
+import { extractProduct, importRemoteItemImage } from "@/lib/extract.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   fetchCategories,
@@ -44,6 +44,7 @@ function NewItem() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const extract = useServerFn(extractProduct);
+  const importImage = useServerFn(importRemoteItemImage);
   const [itemId] = useState(() => crypto.randomUUID());
 
   const categoriesQuery = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
@@ -73,7 +74,7 @@ function NewItem() {
         method: result.method,
         confidence: result.confidence,
         error: result.errorMessage ?? null,
-        warnings: missingFieldWarnings(result.fieldsFound),
+        warnings: [...new Set([...missingFieldWarnings(result.fieldsFound), ...result.warnings])],
       });
       setValues((prev) => ({
         ...prev,
@@ -129,13 +130,28 @@ function NewItem() {
         .single();
       if (error) throw error;
 
-      await syncItemImageMetadata({
-        userId,
-        itemId: data.id,
-        storagePath: payload.image_storage_path ?? null,
-        sourceUrl: payload.primary_image_url ?? null,
-        altText: payload.title,
-      });
+      let importedImage = false;
+      if (!payload.image_storage_path && payload.primary_image_url) {
+        const imported = await importImage({
+          data: {
+            itemId: data.id,
+            imageUrl: payload.primary_image_url,
+            altText: payload.title,
+            existingWarnings: payload.extraction_warnings ?? [],
+          },
+        });
+        importedImage = imported.ok;
+      }
+
+      if (!importedImage) {
+        await syncItemImageMetadata({
+          userId,
+          itemId: data.id,
+          storagePath: payload.image_storage_path ?? null,
+          sourceUrl: payload.primary_image_url ?? null,
+          altText: payload.title,
+        });
+      }
 
       if (values.collectionIds.length) {
         const { error: linkError } = await supabase.from("item_collections").insert(
