@@ -42,17 +42,17 @@ import {
   sortItems,
   totalsByCurrency,
   type SortValue,
-} from "@/lib/aspire";
+} from "@/lib/wishlist";
 
 export const Route = createFileRoute("/_authenticated/collections/$id")({
   head: () => ({
     meta: [
-      { title: "Collection — AspireList" },
+      { title: "Collection — Wishlist" },
       {
         name: "description",
         content: "One theme, its items, its budget, and how far along it is.",
       },
-      { property: "og:title", content: "Collection — AspireList" },
+      { property: "og:title", content: "Collection — Wishlist" },
       {
         property: "og:description",
         content: "One theme, its items, its budget, and how far along it is.",
