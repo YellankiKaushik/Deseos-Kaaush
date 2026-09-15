@@ -91,13 +91,13 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-6">
-              <p className="font-display mb-6 text-xl">AspireList</p>
+              <p className="font-display mb-6 text-xl">Wishlist</p>
               {nav}
             </SheetContent>
           </Sheet>
 
           <Link to="/dashboard" className="font-display text-xl tracking-tight">
-            Aspire<span className="text-primary">List</span>
+            Wishlist
           </Link>
 
           <div className="ml-auto flex items-center gap-2">
