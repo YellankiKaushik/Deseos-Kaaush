@@ -209,46 +209,55 @@
 ## 5. Feature Breakdown
 
 ### 1. Authentication and account lifecycle
+
 - Main files involved: src/routes/auth.tsx, src/integrations/supabase/client.ts, src/integrations/lovable/index.ts, src/integrations/supabase/auth-attacher.ts
 - Purpose: Sign in, sign up, sign out, and support Google OAuth.
 - Dependencies: Supabase Auth, Lovable cloud auth integration, TanStack Router navigation.
 
 ### 2. Dashboard and wishlist management
+
 - Main files involved: src/routes/_authenticated/dashboard.tsx, src/components/item-card.tsx, src/lib/queries.ts, src/lib/aspire.ts
 - Purpose: Display wishlist items with search, filters, sorting, progress, and summary totals.
 - Dependencies: React Query, Supabase items table, shared Aspire helpers.
 
 ### 3. Item creation and editing
+
 - Main files involved: src/routes/_authenticated/items.new.tsx, src/routes/_authenticated/items.$id.tsx, src/components/item-form.tsx, src/components/image-field.tsx
 - Purpose: Add new items, edit existing items, attach images, assign categories/collections, and save progress.
 - Dependencies: Supabase items table, item payload helpers, image storage helpers, TanStack Router.
 
 ### 4. Product link extraction
+
 - Main files involved: src/lib/extract.server.ts, src/lib/extract.functions.ts, src/lib/extraction-ui.ts, src/routes/_authenticated/items.new.tsx
 - Purpose: Fetch product metadata from web pages, extract structured fields, and fall back to manual entry when extraction fails.
 - Dependencies: Server-side fetch logic, Supabase logging, UI extraction feedback.
 
 ### 5. Collections and categorization
+
 - Main files involved: src/routes/_authenticated/collections.index.tsx, src/routes/_authenticated/collections.$id.tsx, src/routes/_authenticated/categories.tsx
 - Purpose: Organize wishlisted items into collections and categories.
 - Dependencies: Supabase collections, categories, and item_collections tables.
 
 ### 6. Purchase tracking and status lifecycle
+
 - Main files involved: src/routes/_authenticated/purchased.tsx, src/routes/_authenticated/archived.tsx, src/lib/aspire.ts
 - Purpose: Separate purchased, archived, and active items while preserving historical metadata.
 - Dependencies: item status and archived flags in the database.
 
 ### 7. User settings and backup/restore
+
 - Main files involved: src/routes/_authenticated/settings.tsx, src/lib/backup.ts, src/lib/queries.ts
 - Purpose: Manage theme and display preferences, export user data, and restore from a backup file.
 - Dependencies: Supabase profiles and user-owned tables.
 
 ### 8. Image storage and media handling
+
 - Main files involved: src/components/item-image.tsx, src/lib/images.ts, src/integrations/supabase/client.ts
 - Purpose: Upload item photos and display them from Supabase storage.
 - Dependencies: Supabase storage bucket and signed URL handling.
 
 ### 9. Error handling and observability
+
 - Main files involved: src/lib/error-page.ts, src/lib/error-capture.ts, src/lib/lovable-error-reporting.ts, src/server.ts, src/start.ts
 - Purpose: Render friendly error pages and capture runtime problems for investigation.
 - Dependencies: TanStack Start middleware, Lovable error reporting hooks.
@@ -258,36 +267,44 @@
 The following is a logical development sequence based on the current codebase. It is a proposed milestone plan, not a fabricated commit history.
 
 ### Phase 1 — Project foundation
+
 - Establish the app shell, routing, and shared UI foundation.
 - Configure TypeScript, Vite, TanStack Start, styling, and lint/test tooling.
 - Add the initial documentation and environment configuration.
 
 ### Phase 2 — Authentication and user model
+
 - Implement Supabase client setup and auth flows.
 - Add protected routes and user profile bootstrap logic.
 - Connect account sign-in/sign-out and OAuth entry points.
 
 ### Phase 3 — Database and data access layer
+
 - Create and refine the Supabase migrations for profiles, categories, collections, items, and related tables.
 - Add query helpers and shared type definitions for app entities.
 
 ### Phase 4 — Core wishlist workflow
+
 - Implement the dashboard, item listing, filters, sorting, and card UI.
 - Add item creation and editing flows, including validation and saving logic.
 
 ### Phase 5 — Rich item features
+
 - Add price tracking, reason/status fields, savings progress, and purchase/archived states.
 - Add image upload and storage integration.
 
 ### Phase 6 — Link extraction and enrichment
+
 - Build and refine the server-side product extraction pipeline.
 - Surface extraction feedback and manual correction in the item form.
 
 ### Phase 7 — Organization and productivity features
+
 - Implement collections, categories, duplicate detection, and backup/export utilities.
 - Add settings for preferences and restore/import workflows.
 
 ### Phase 8 — Testing, documentation, and refinement
+
 - Add and expand automated tests.
 - Improve developer documentation and cleanup shared helpers.
 - Refactor the app structure for maintainability and future expansion.
@@ -295,6 +312,7 @@ The following is a logical development sequence based on the current codebase. I
 ## 7. Dependency Summary
 
 ### Frontend
+
 - react
 - react-dom
 - @tanstack/react-router
@@ -309,19 +327,23 @@ The following is a logical development sequence based on the current codebase. I
 - embla-carousel-react
 
 ### Backend
+
 - nitro
 - @supabase/supabase-js
 - @tanstack/react-start
 
 ### Database
+
 - PostgreSQL (via Supabase)
 - Supabase SQL migrations
 
 ### Authentication
+
 - @supabase/supabase-js
 - @lovable.dev/cloud-auth-js
 
 ### Styling
+
 - tailwindcss
 - @tailwindcss/vite
 - tw-animate-css
@@ -330,6 +352,7 @@ The following is a logical development sequence based on the current codebase. I
 - tailwind-merge
 
 ### Utilities
+
 - zod
 - date-fns
 - input-otp
@@ -338,6 +361,7 @@ The following is a logical development sequence based on the current codebase. I
 - @hookform/resolvers
 
 ### Dev dependencies
+
 - vite
 - vitest
 - typescript
