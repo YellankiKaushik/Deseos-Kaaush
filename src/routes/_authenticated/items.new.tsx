@@ -17,7 +17,7 @@ import {
   numberOrNull,
   requireUserId,
 } from "@/lib/queries";
-import { normalizeUrl } from "@/lib/aspire";
+import { normalizeUrl } from "@/lib/wishlist";
 import { itemPayload, type ExtractionMeta } from "@/lib/item-payload";
 import { missingFieldWarnings } from "@/lib/extraction-ui";
 import { syncItemImageMetadata } from "@/lib/images";
@@ -25,12 +25,12 @@ import { syncItemImageMetadata } from "@/lib/images";
 export const Route = createFileRoute("/_authenticated/items/new")({
   head: () => ({
     meta: [
-      { title: "Add an item — AspireList" },
+      { title: "Add an item — Wishlist" },
       {
         name: "description",
         content: "Paste a link or enter details by hand to add something to your list.",
       },
-      { property: "og:title", content: "Add an item — AspireList" },
+      { property: "og:title", content: "Add an item — Wishlist" },
       {
         property: "og:description",
         content: "Paste a link or enter details by hand to add something to your list.",
