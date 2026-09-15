@@ -24,6 +24,7 @@ export type ExtractedProduct = {
   status: "success" | "partial" | "failed";
   errorCode?: string;
   errorMessage?: string;
+  warnings: string[];
   fieldsFound: Record<string, boolean>;
 };
 
@@ -42,6 +43,19 @@ const BLOCKED_HOST_PATTERNS = [
 ];
 const MAX_RESPONSE_BYTES = 2_000_000;
 const MAX_REDIRECTS = 5;
+
+type ImageCandidate = {
+  url: string;
+  source:
+    | "json-ld"
+    | "json-ld-graph"
+    | "og-image"
+    | "og-image-secure"
+    | "twitter-image"
+    | "schema-image"
+    | "img-heuristic";
+  score: number;
+};
 
 export function validateUrl(
   raw: string,
@@ -103,14 +117,24 @@ function metaContent(
   attr: "property" | "name" | "itemprop",
   key: string,
 ): string | null {
-  const re = new RegExp(
-    `<meta[^>]+${attr}=["']${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["'][^>]*>`,
-    "i",
-  );
-  const tag = html.match(re)?.[0];
-  if (!tag) return null;
-  const content = tag.match(/content=["']([^"']*)["']/i)?.[1];
-  return clean(content);
+  return metaContents(html, attr, key)[0] ?? null;
+}
+
+function attrValue(tag: string, attr: string): string | null {
+  const escaped = attr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = tag.match(new RegExp(`\\s${escaped}\\s*=\\s*(["'])([\\s\\S]*?)\\1`, "i"));
+  return clean(match?.[2]);
+}
+
+function tagsNamed(html: string, tagName: string): string[] {
+  return html.match(new RegExp(`<${tagName}\\b[^>]*>`, "gi")) ?? [];
+}
+
+function metaContents(html: string, attr: "property" | "name" | "itemprop", key: string): string[] {
+  return tagsNamed(html, "meta")
+    .filter((tag) => attrValue(tag, attr)?.toLowerCase() === key.toLowerCase())
+    .map((tag) => attrValue(tag, "content"))
+    .filter((value): value is string => Boolean(value));
 }
 
 function collectJsonLd(html: string): unknown[] {
@@ -153,14 +177,17 @@ function isType(node: Record<string, unknown>, type: string) {
   return false;
 }
 
-function firstImage(value: unknown): string | null {
-  if (typeof value === "string") return clean(value);
-  if (Array.isArray(value)) return firstImage(value[0]);
+function imagesFromValue(value: unknown): string[] {
+  if (typeof value === "string") {
+    const image = clean(value);
+    return image ? [image] : [];
+  }
+  if (Array.isArray(value)) return value.flatMap((item) => imagesFromValue(item));
   if (value && typeof value === "object") {
     const obj = value as Record<string, unknown>;
-    return firstImage(obj["url"] ?? obj["contentUrl"]);
+    return imagesFromValue(obj["url"] ?? obj["contentUrl"]);
   }
-  return null;
+  return [];
 }
 
 function absolute(base: URL, value: string | null): string | null {
@@ -170,6 +197,122 @@ function absolute(base: URL, value: string | null): string | null {
   } catch {
     return null;
   }
+}
+
+function normalizeImageUrl(base: URL, value: string | null) {
+  const resolved = absolute(base, value);
+  if (!resolved) return null;
+  const validated = validateUrl(resolved);
+  if (!validated.ok) return null;
+  validated.url.hash = "";
+  validated.url.protocol = validated.url.protocol.toLowerCase();
+  validated.url.hostname = validated.url.hostname.toLowerCase();
+  return validated.url.toString();
+}
+
+function addImageCandidate(
+  candidates: ImageCandidate[],
+  seen: Set<string>,
+  base: URL,
+  value: string | null,
+  source: ImageCandidate["source"],
+  score: number,
+) {
+  const url = normalizeImageUrl(base, value);
+  if (!url || seen.has(url)) return;
+  seen.add(url);
+  candidates.push({ url, source, score });
+}
+
+export function srcsetCandidates(srcset: string | null): string[] {
+  if (!srcset) return [];
+  return srcset
+    .split(",")
+    .map((part) => {
+      const [url, descriptor] = part.trim().split(/\s+/, 2);
+      const width = descriptor?.endsWith("w") ? Number.parseInt(descriptor, 10) : 0;
+      return { url: clean(url), width: Number.isFinite(width) ? width : 0 };
+    })
+    .filter((candidate): candidate is { url: string; width: number } => Boolean(candidate.url))
+    .sort((a, b) => b.width - a.width)
+    .map((candidate) => candidate.url);
+}
+
+function imageHeuristicScore(tag: string, url: string, fallbackScore: number) {
+  const haystack = `${tag} ${url}`.toLowerCase();
+  if (/logo|icon|sprite|avatar|placeholder|loading|blank|transparent/.test(haystack)) return 0;
+  if (/\.svg(?:[?#]|$)|data:image\//.test(haystack)) return 0;
+
+  const width = Number.parseInt(attrValue(tag, "width") ?? "", 10);
+  const height = Number.parseInt(attrValue(tag, "height") ?? "", 10);
+  let score = fallbackScore;
+  if (Number.isFinite(width) && Number.isFinite(height)) {
+    if (width < 180 || height < 180) return 0;
+    score += Math.min(15, Math.round((width * height) / 100_000));
+  }
+  if (/product|primary|main|hero|gallery|pdp|image|photo/.test(haystack)) score += 12;
+  return score;
+}
+
+export function imageCandidatesFromHtml(html: string, baseUrl: string): ImageCandidate[] {
+  const base = new URL(baseUrl);
+  const candidates: ImageCandidate[] = [];
+  const seen = new Set<string>();
+  const jsonLdBlocks = collectJsonLd(html);
+
+  for (const block of jsonLdBlocks) {
+    const nodes = flattenNodes(block);
+    for (const product of nodes.filter((node) => isType(node, "product"))) {
+      const source = nodes[0] === product ? "json-ld" : "json-ld-graph";
+      for (const image of imagesFromValue(product["image"])) {
+        addImageCandidate(candidates, seen, base, image, source, source === "json-ld" ? 100 : 98);
+      }
+    }
+  }
+
+  for (const image of metaContents(html, "property", "og:image")) {
+    addImageCandidate(candidates, seen, base, image, "og-image", 90);
+  }
+  for (const image of metaContents(html, "property", "og:image:secure_url")) {
+    addImageCandidate(candidates, seen, base, image, "og-image-secure", 85);
+  }
+  for (const image of [
+    ...metaContents(html, "name", "twitter:image"),
+    ...metaContents(html, "property", "twitter:image"),
+  ]) {
+    addImageCandidate(candidates, seen, base, image, "twitter-image", 80);
+  }
+  for (const image of [
+    ...metaContents(html, "itemprop", "image"),
+    ...metaContents(html, "property", "schema:image"),
+    ...metaContents(html, "property", "schema:image:url"),
+  ]) {
+    addImageCandidate(candidates, seen, base, image, "schema-image", 70);
+  }
+  for (const tag of [...tagsNamed(html, "link"), ...tagsNamed(html, "img")]) {
+    if (attrValue(tag, "itemprop")?.toLowerCase() !== "image") continue;
+    const image = attrValue(tag, "content") ?? attrValue(tag, "href") ?? attrValue(tag, "src");
+    addImageCandidate(candidates, seen, base, image, "schema-image", 70);
+  }
+
+  for (const tag of tagsNamed(html, "img")) {
+    const urls = [
+      ...srcsetCandidates(attrValue(tag, "srcset")),
+      attrValue(tag, "data-src"),
+      attrValue(tag, "data-original"),
+      attrValue(tag, "src"),
+    ].filter((value): value is string => Boolean(value));
+    for (const image of urls) {
+      const normalized = normalizeImageUrl(base, image);
+      if (!normalized || seen.has(normalized)) continue;
+      const score = imageHeuristicScore(tag, normalized, 45);
+      if (score <= 0) continue;
+      seen.add(normalized);
+      candidates.push({ url: normalized, source: "img-heuristic", score });
+    }
+  }
+
+  return candidates.sort((a, b) => b.score - a.score);
 }
 
 function storeNameFromDomain(domain: string | null) {
@@ -225,6 +368,7 @@ export async function fetchAndExtract(rawUrl: string): Promise<ExtractedProduct>
     method: "none",
     confidence: 0,
     status: "failed",
+    warnings: [],
     fieldsFound: {},
   };
 
@@ -324,6 +468,12 @@ export async function fetchAndExtract(rawUrl: string): Promise<ExtractedProduct>
 
   const resolved = new URL(base.resolvedUrl ?? url.toString());
   const methods: string[] = [];
+  const imageCandidates = imageCandidatesFromHtml(html, resolved.toString());
+  if (imageCandidates[0]) {
+    base.imageUrl = imageCandidates[0].url;
+  } else {
+    base.warnings.push("No usable product image was found.");
+  }
 
   // 1. JSON-LD
   const nodes = collectJsonLd(html).flatMap((block) => flattenNodes(block));
@@ -335,7 +485,6 @@ export async function fetchAndExtract(rawUrl: string): Promise<ExtractedProduct>
     methods.push("json-ld");
     base.title = clean(product["name"]) ?? base.title;
     base.description = clean(product["description"]) ?? base.description;
-    base.imageUrl = absolute(resolved, firstImage(product["image"])) ?? base.imageUrl;
     const brand = product["brand"];
     base.brand =
       clean(
@@ -362,10 +511,6 @@ export async function fetchAndExtract(rawUrl: string): Promise<ExtractedProduct>
   // 2. Open Graph
   const ogTitle = metaContent(html, "property", "og:title");
   const ogDescription = metaContent(html, "property", "og:description");
-  const ogImage =
-    metaContent(html, "property", "og:image:secure_url") ??
-    metaContent(html, "property", "og:image") ??
-    metaContent(html, "name", "twitter:image");
   const ogSite = metaContent(html, "property", "og:site_name");
   const ogPrice =
     metaContent(html, "property", "product:price:amount") ??
@@ -374,10 +519,10 @@ export async function fetchAndExtract(rawUrl: string): Promise<ExtractedProduct>
     metaContent(html, "property", "product:price:currency") ??
     metaContent(html, "property", "og:price:currency");
 
-  if (ogTitle || ogImage || ogPrice) methods.push("open-graph");
+  if (ogTitle || imageCandidates.some((image) => image.source.startsWith("og-")) || ogPrice)
+    methods.push("open-graph");
   base.title = base.title ?? ogTitle;
   base.description = base.description ?? ogDescription;
-  base.imageUrl = base.imageUrl ?? absolute(resolved, ogImage);
   base.storeName = ogSite ?? base.storeName;
   base.price = base.price ?? toNumber(ogPrice);
   base.currency = base.currency ?? ogCurrency;
