@@ -29,4 +29,4 @@ Configure local and production redirect URLs in Supabase Auth:
 
 ## Account Deletion
 
-Account deletion is server-side only through `src/lib/account.functions.ts`. It requires `SUPABASE_SERVICE_ROLE_KEY` on the server and deletes the authenticated user ID determined by middleware. Do not expose this key through `VITE_*`.
+Account deletion is server-side only through `src/lib/account.functions.ts`. It requires `SUPABASE_SECRET_KEY` on the server and deletes the authenticated user ID determined by middleware. `SUPABASE_SERVICE_ROLE_KEY` is supported only as a deprecated legacy fallback. Do not expose either key through `VITE_*`.
