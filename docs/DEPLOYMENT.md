@@ -19,14 +19,22 @@ Set these on the deployment host:
 - `VITE_SUPABASE_PROJECT_ID`
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` if account deletion should work
 - `SUPABASE_PROJECT_ID` for Lovable compatibility if needed
+- `SUPABASE_SECRET_KEY` if account deletion should work
+- `SUPABASE_SERVICE_ROLE_KEY` only as a deprecated legacy fallback
 
-Do not set service-role or private API keys with `VITE_` prefixes.
+Do not set secret, service-role, or other private API keys with `VITE_` prefixes.
 
 ## Vercel Notes
 
-The source is a TanStack Start/Nitro app, but the current Lovable Vite config builds with a Cloudflare-oriented Nitro preset by default. Before Vercel production deployment, confirm the Nitro preset/output expected by the hosting target or adjust deployment configuration deliberately.
+The source is a TanStack Start/Nitro app. Normal production builds are pinned to Nitro's `vercel` preset in `vite.config.ts`, which emits Vercel Build Output API files under `.vercel/output`. Lovable sandbox builds may still force their own Cloudflare output internally.
+
+Recommended Vercel project settings:
+
+- Framework preset: Other, Vite, or TanStack Start if offered by the dashboard.
+- Install command: `npm install`
+- Build command: `npm run build`
+- Output directory: leave empty/default so Vercel can use `.vercel/output`.
 
 ## Manual External Setup
 
