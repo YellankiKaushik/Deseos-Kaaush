@@ -29,7 +29,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { deleteAccount } from "@/lib/account.functions";
-import { CURRENCIES, type ViewMode } from "@/lib/aspire";
+import { CURRENCIES, type ViewMode } from "@/lib/wishlist";
 import {
   backupRowCounts,
   importUserData,
@@ -43,10 +43,10 @@ import { exportUserData, fetchProfile, requireUserId } from "@/lib/queries";
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — AspireList" },
-      { name: "description", content: "Manage your AspireList profile, preferences, and data." },
-      { property: "og:title", content: "Settings — AspireList" },
-      { property: "og:description", content: "Manage your AspireList profile and data." },
+      { title: "Settings — Wishlist" },
+      { name: "description", content: "Manage your Wishlist profile, preferences, and data." },
+      { property: "og:title", content: "Settings — Wishlist" },
+      { property: "og:description", content: "Manage your Wishlist profile and data." },
     ],
   }),
   component: Settings,
@@ -111,7 +111,7 @@ function Settings() {
     mutationFn: exportUserData,
     onSuccess: (data) => {
       downloadText(
-        `aspirelist-backup-${new Date().toISOString().slice(0, 10)}.json`,
+        `wishlist-backup-${new Date().toISOString().slice(0, 10)}.json`,
         JSON.stringify(data, null, 2),
         "application/json",
       );
@@ -124,7 +124,7 @@ function Settings() {
     mutationFn: exportUserData,
     onSuccess: (data) => {
       downloadText(
-        `aspirelist-items-${new Date().toISOString().slice(0, 10)}.csv`,
+        `wishlist-items-${new Date().toISOString().slice(0, 10)}.csv`,
         itemsToCsv(data.data.items as Record<string, unknown>[]),
         "text/csv",
       );
@@ -171,7 +171,7 @@ function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries();
       setDeleteConfirmation("");
-      toast.success("Your AspireList data was deleted.");
+      toast.success("Your Wishlist data was deleted.");
     },
     onError: (error) => toast.error(error instanceof Error ? error.message : "Deletion failed."),
   });
@@ -328,7 +328,7 @@ function Settings() {
           <div>
             <h2 className="font-display text-lg">Danger zone</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              These actions affect only the signed-in account's AspireList data.
+              These actions affect only the signed-in account's Wishlist data.
             </p>
           </div>
         </div>
