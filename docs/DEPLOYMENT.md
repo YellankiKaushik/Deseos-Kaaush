@@ -16,18 +16,19 @@ Set these on the deployment host:
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
-- `VITE_SUPABASE_PROJECT_ID`
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_PROJECT_ID` for Lovable compatibility if needed
-- `SUPABASE_SECRET_KEY` if account deletion should work
-- `SUPABASE_SERVICE_ROLE_KEY` only as a deprecated legacy fallback
+- `SUPABASE_SECRET_KEY`
+
+`SUPABASE_SERVICE_ROLE_KEY` is supported only as a deprecated legacy fallback. Prefer an
+`sb_secret_...` key in `SUPABASE_SECRET_KEY`.
 
 Do not set secret, service-role, or other private API keys with `VITE_` prefixes.
 
 ## Vercel Notes
 
-The source is a TanStack Start/Nitro app. Normal production builds are pinned to Nitro's `vercel` preset in `vite.config.ts`, which emits Vercel Build Output API files under `.vercel/output`. Lovable sandbox builds may still force their own Cloudflare output internally.
+The source is a TanStack Start/Nitro app. Production builds are pinned to Nitro's `vercel` preset in
+`vite.config.ts`, which emits Vercel Build Output API files under `.vercel/output`.
 
 Recommended Vercel project settings:
 
@@ -40,7 +41,8 @@ Recommended Vercel project settings:
 
 1. Create or choose a Supabase project.
 2. Run migrations from `supabase/migrations`.
-3. Configure Auth providers and redirect URLs.
-4. Confirm the private `item-images` bucket exists.
-5. Add environment variables to the hosting provider.
-6. Run the verification commands above.
+3. Configure email/password and Google OAuth providers in Supabase Auth.
+4. Configure local, preview, and production redirect URLs.
+5. Confirm the private `item-images` bucket exists.
+6. Add environment variables to the hosting provider.
+7. Run the verification commands above.
