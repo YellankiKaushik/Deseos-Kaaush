@@ -40,6 +40,8 @@ const BLOCKED_HOST_PATTERNS = [
   /^\[?f[cd]/i,
   /metadata\.google\.internal$/i,
 ];
+const MAX_RESPONSE_BYTES = 2_000_000;
+const MAX_REDIRECTS = 5;
 
 export function validateUrl(
   raw: string,
@@ -176,6 +178,33 @@ function storeNameFromDomain(domain: string | null) {
   return core.charAt(0).toUpperCase() + core.slice(1);
 }
 
+async function readLimitedText(response: Response) {
+  if (!response.body) return (await response.text()).slice(0, MAX_RESPONSE_BYTES);
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!value) continue;
+    size += value.byteLength;
+    if (size > MAX_RESPONSE_BYTES) {
+      await reader.cancel();
+      throw new Error("response_too_large");
+    }
+    chunks.push(value);
+  }
+
+  return new TextDecoder().decode(Uint8Array.from(chunks.flatMap((chunk) => [...chunk])));
+}
+
+function redirectTarget(current: URL, response: Response) {
+  const location = response.headers.get("location");
+  if (!location) return null;
+  return new URL(location, current);
+}
+
 export async function fetchAndExtract(rawUrl: string): Promise<ExtractedProduct> {
   const base: ExtractedProduct = {
     requestedUrl: rawUrl,
@@ -211,18 +240,50 @@ export async function fetchAndExtract(rawUrl: string): Promise<ExtractedProduct>
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 12000);
-    const response = await fetch(url.toString(), {
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-      },
-    });
-    clearTimeout(timer);
-    base.resolvedUrl = response.url || url.toString();
+    let current = url;
+    let response: Response | null = null;
+    let tooManyRedirects = false;
+
+    try {
+      for (let redirect = 0; redirect <= MAX_REDIRECTS; redirect += 1) {
+        response = await fetch(current.toString(), {
+          redirect: "manual",
+          signal: controller.signal,
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+          },
+        });
+
+        if (![301, 302, 303, 307, 308].includes(response.status)) break;
+        if (redirect === MAX_REDIRECTS) {
+          tooManyRedirects = true;
+          break;
+        }
+        const target = redirectTarget(current, response);
+        if (!target) break;
+        const checked = validateUrl(target.toString());
+        if (!checked.ok) {
+          return { ...base, errorCode: checked.code, errorMessage: checked.message };
+        }
+        current = checked.url;
+      }
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (!response) throw new Error("network_error");
+    base.resolvedUrl = response.url || current.toString();
+
+    if (tooManyRedirects) {
+      return {
+        ...base,
+        errorCode: "too_many_redirects",
+        errorMessage: "That page redirects too many times. Add the details manually.",
+      };
+    }
 
     if (!response.ok) {
       return {
@@ -246,15 +307,18 @@ export async function fetchAndExtract(rawUrl: string): Promise<ExtractedProduct>
         errorMessage: "That link isn't a web page we can read.",
       };
     }
-    html = (await response.text()).slice(0, 2_000_000);
+    html = await readLimitedText(response);
   } catch (error) {
     const aborted = error instanceof Error && error.name === "AbortError";
+    const tooLarge = error instanceof Error && error.message === "response_too_large";
     return {
       ...base,
-      errorCode: aborted ? "timeout" : "network_error",
+      errorCode: aborted ? "timeout" : tooLarge ? "response_too_large" : "network_error",
       errorMessage: aborted
         ? "The site took too long to respond. Add the details manually."
-        : "We couldn't reach that page. Add the details manually.",
+        : tooLarge
+          ? "That page is too large to read safely. Add the details manually."
+          : "We couldn't reach that page. Add the details manually.",
     };
   }
 
