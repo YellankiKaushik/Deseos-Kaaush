@@ -37,7 +37,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { extractProduct } from "@/lib/extract.functions";
 import { itemPayload, type ExtractionMeta } from "@/lib/item-payload";
 import { missingFieldWarnings } from "@/lib/extraction-ui";
-import { removeAllItemImages } from "@/lib/images";
+import { removeAllItemImages, syncItemImageMetadata } from "@/lib/images";
 import {
   fetchCategories,
   fetchCollections,
@@ -78,6 +78,7 @@ function ItemDetail() {
     meta: ExtractionMeta;
     changes: { label: string; from: string; to: string; apply: () => void }[];
   } | null>(null);
+  const [pendingExtractionMeta, setPendingExtractionMeta] = useState<ExtractionMeta | null>(null);
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [actualPrice, setActualPrice] = useState("");
   const [reflection, setReflection] = useState("");
@@ -121,6 +122,10 @@ function ItemDetail() {
       target_purchase_date: item.target_purchase_date ?? "",
       target_budget: item.target_budget != null ? String(item.target_budget) : "",
       amount_saved: item.amount_saved != null ? String(item.amount_saved) : "",
+      purchased_at: item.purchased_at ?? "",
+      actual_purchase_price:
+        item.actual_purchase_price != null ? String(item.actual_purchase_price) : "",
+      purchase_reflection: item.purchase_reflection ?? "",
       collectionIds: linkedQuery.data ?? [],
     });
     setActualPrice(
@@ -135,8 +140,17 @@ function ItemDetail() {
     mutationFn: async () => {
       const userId = await requireUserId();
       const price = numberOrNull(values.current_price);
-      const { error } = await supabase.from("items").update(itemPayload(values)).eq("id", id);
+      const payload = itemPayload(values, pendingExtractionMeta);
+      const { error } = await supabase.from("items").update(payload).eq("id", id);
       if (error) throw error;
+
+      await syncItemImageMetadata({
+        userId,
+        itemId: id,
+        storagePath: payload.image_storage_path ?? null,
+        sourceUrl: payload.primary_image_url ?? null,
+        altText: payload.title,
+      });
 
       await supabase.from("item_collections").delete().eq("item_id", id);
       if (values.collectionIds.length) {
@@ -164,6 +178,8 @@ function ItemDetail() {
       queryClient.invalidateQueries({ queryKey: ["item-collections", id] });
       queryClient.invalidateQueries({ queryKey: ["price-history", id] });
       setEditing(false);
+      setPendingExtractionMeta(null);
+      setRecheck(null);
       toast.success("Saved.");
     },
     onError: (error) =>
@@ -216,8 +232,11 @@ function ItemDetail() {
       propose("Availability", values.availability, result.availability, "availability");
       propose("Image", values.primary_image_url, result.imageUrl, "primary_image_url");
       propose("Store", values.store_name, result.storeName, "store_name");
+      propose("Brand", values.brand, result.brand, "brand");
+      propose("Canonical link", values.canonical_url, result.canonicalUrl, "canonical_url");
 
       setRecheck({ meta, changes });
+      setPendingExtractionMeta(meta);
       setEditing(true);
       if (!changes.length) toast.success("Nothing changed on that page.");
     },
@@ -461,7 +480,14 @@ function ItemDetail() {
               ) : (
                 <Button
                   variant="secondary"
-                  onClick={() => quickAction.mutate({ status: "wanted", purchased_at: null })}
+                  onClick={() =>
+                    quickAction.mutate({
+                      status: "wanted",
+                      purchased_at: null,
+                      actual_purchase_price: null,
+                      purchase_reflection: null,
+                    })
+                  }
                 >
                   Move back to the list
                 </Button>
