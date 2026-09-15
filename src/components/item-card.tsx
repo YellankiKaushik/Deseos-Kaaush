@@ -4,7 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ItemImage } from "@/components/item-image";
 
-import { formatMoney, priorityLabel, savingsProgress, statusLabel, type Item } from "@/lib/aspire";
+import {
+  formatMoney,
+  priorityLabel,
+  savingsProgress,
+  statusLabel,
+  type Item,
+} from "@/lib/wishlist";
 import { cn } from "@/lib/utils";
 
 function PriorityBadge({ priority }: { priority: string }) {
