@@ -34,7 +34,7 @@ import { ItemForm, emptyItemForm, type ItemFormValues } from "@/components/item-
 import { ItemImage } from "@/components/item-image";
 import type { TablesUpdate } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
-import { extractProduct } from "@/lib/extract.functions";
+import { extractProduct, importRemoteItemImage } from "@/lib/extract.functions";
 import { itemPayload, type ExtractionMeta } from "@/lib/item-payload";
 import { missingFieldWarnings } from "@/lib/extraction-ui";
 import { removeAllItemImages, syncItemImageMetadata } from "@/lib/images";
@@ -72,6 +72,7 @@ function ItemDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const extract = useServerFn(extractProduct);
+  const importImage = useServerFn(importRemoteItemImage);
   const [editing, setEditing] = useState(false);
   const [values, setValues] = useState<ItemFormValues>(emptyItemForm);
   const [recheck, setRecheck] = useState<{
@@ -144,13 +145,28 @@ function ItemDetail() {
       const { error } = await supabase.from("items").update(payload).eq("id", id);
       if (error) throw error;
 
-      await syncItemImageMetadata({
-        userId,
-        itemId: id,
-        storagePath: payload.image_storage_path ?? null,
-        sourceUrl: payload.primary_image_url ?? null,
-        altText: payload.title,
-      });
+      let importedImage = false;
+      if (!payload.image_storage_path && payload.primary_image_url) {
+        const imported = await importImage({
+          data: {
+            itemId: id,
+            imageUrl: payload.primary_image_url,
+            altText: payload.title,
+            existingWarnings: payload.extraction_warnings ?? item?.extraction_warnings ?? [],
+          },
+        });
+        importedImage = imported.ok;
+      }
+
+      if (!importedImage) {
+        await syncItemImageMetadata({
+          userId,
+          itemId: id,
+          storagePath: payload.image_storage_path ?? null,
+          sourceUrl: payload.primary_image_url ?? null,
+          altText: payload.title,
+        });
+      }
 
       await supabase.from("item_collections").delete().eq("item_id", id);
       if (values.collectionIds.length) {
@@ -199,7 +215,7 @@ function ItemDetail() {
         method: result.method,
         confidence: result.confidence,
         error: result.errorMessage ?? null,
-        warnings: missingFieldWarnings(result.fieldsFound),
+        warnings: [...new Set([...missingFieldWarnings(result.fieldsFound), ...result.warnings])],
       };
       const changes: { label: string; from: string; to: string; apply: () => void }[] = [];
       const propose = (
@@ -207,13 +223,14 @@ function ItemDetail() {
         from: string,
         to: string | null | undefined,
         key: keyof ItemFormValues,
+        apply?: () => void,
       ) => {
         if (to == null || String(to).trim() === "" || String(to) === from) return;
         changes.push({
           label,
           from: from || "—",
           to: String(to),
-          apply: () => setValues((prev) => ({ ...prev, [key]: String(to) })),
+          apply: apply ?? (() => setValues((prev) => ({ ...prev, [key]: String(to) }))),
         });
       };
       propose("Name", values.title, result.title, "title");
@@ -230,7 +247,15 @@ function ItemDetail() {
         "original_price",
       );
       propose("Availability", values.availability, result.availability, "availability");
-      propose("Image", values.primary_image_url, result.imageUrl, "primary_image_url");
+      propose("Image", values.primary_image_url, result.imageUrl, "primary_image_url", () =>
+        setValues((prev) => ({
+          ...prev,
+          primary_image_url: String(result.imageUrl),
+          image_storage_path: prev.image_storage_path?.includes(`/${id}/remote-`)
+            ? null
+            : prev.image_storage_path,
+        })),
+      );
       propose("Store", values.store_name, result.storeName, "store_name");
       propose("Brand", values.brand, result.brand, "brand");
       propose("Canonical link", values.canonical_url, result.canonicalUrl, "canonical_url");
