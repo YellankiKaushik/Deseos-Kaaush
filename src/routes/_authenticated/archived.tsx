@@ -25,16 +25,16 @@ import {
 } from "@/components/ui/select";
 import { ItemCard } from "@/components/item-card";
 import { supabase } from "@/integrations/supabase/client";
-import { itemMatchesSearch, sortItems, type SortValue } from "@/lib/aspire";
+import { itemMatchesSearch, sortItems, type SortValue } from "@/lib/wishlist";
 import { removeAllItemImages } from "@/lib/images";
 import { fetchItems, requireUserId } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authenticated/archived")({
   head: () => ({
     meta: [
-      { title: "Archived — AspireList" },
+      { title: "Archived — Wishlist" },
       { name: "description", content: "Items you've set aside without deleting them." },
-      { property: "og:title", content: "Archived — AspireList" },
+      { property: "og:title", content: "Archived — Wishlist" },
       { property: "og:description", content: "Items you've set aside without deleting them." },
     ],
   }),
