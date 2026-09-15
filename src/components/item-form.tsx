@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageField } from "@/components/image-field";
-import { CURRENCIES, PRIORITIES, STATUSES, type Category, type Collection } from "@/lib/aspire";
+import { CURRENCIES, PRIORITIES, STATUSES, type Category, type Collection } from "@/lib/wishlist";
 
 export type ItemFormValues = {
   title: string;
