@@ -1,6 +1,6 @@
 import type { TablesInsert } from "@/integrations/supabase/types";
 import type { ItemFormValues } from "@/components/item-form";
-import { domainOf, normalizeUrl } from "@/lib/aspire";
+import { cleanHttpUrl, domainOf, normalizeUrl } from "@/lib/aspire";
 import { intOrNull, numberOrNull } from "@/lib/queries";
 
 export type ExtractionMeta = {
@@ -14,8 +14,9 @@ export type ExtractionMeta = {
 
 /** Single mapping from form state to a database row, shared by create and update. */
 export function itemPayload(values: ItemFormValues, meta?: ExtractionMeta | null) {
-  const sourceUrl = values.source_url.trim() || null;
-  const canonicalUrl = values.canonical_url.trim() || null;
+  const sourceUrl = cleanHttpUrl(values.source_url, "Item link");
+  const canonicalUrl = cleanHttpUrl(values.canonical_url, "Canonical link");
+  const imageUrl = cleanHttpUrl(values.primary_image_url, "Image link");
   const payload: Omit<TablesInsert<"items">, "user_id"> = {
     title: values.title.trim(),
     source_url: sourceUrl,
@@ -31,7 +32,7 @@ export function itemPayload(values: ItemFormValues, meta?: ExtractionMeta | null
     rating: numberOrNull(values.rating),
     review_count: intOrNull(values.review_count),
     availability: values.availability.trim() || null,
-    primary_image_url: values.primary_image_url.trim() || null,
+    primary_image_url: imageUrl,
     image_storage_path: values.image_storage_path || null,
     category_id: values.category_id === "none" ? null : values.category_id,
     priority: values.priority,
@@ -41,6 +42,11 @@ export function itemPayload(values: ItemFormValues, meta?: ExtractionMeta | null
     target_purchase_date: values.target_purchase_date || null,
     target_budget: numberOrNull(values.target_budget),
     amount_saved: numberOrNull(values.amount_saved) ?? 0,
+    purchased_at: values.status === "purchased" ? values.purchased_at || null : null,
+    actual_purchase_price:
+      values.status === "purchased" ? numberOrNull(values.actual_purchase_price) : null,
+    purchase_reflection:
+      values.status === "purchased" ? values.purchase_reflection.trim() || null : null,
   };
 
   if (meta) {
