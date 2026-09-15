@@ -20,6 +20,7 @@ import {
 import { normalizeUrl } from "@/lib/aspire";
 import { itemPayload, type ExtractionMeta } from "@/lib/item-payload";
 import { missingFieldWarnings } from "@/lib/extraction-ui";
+import { syncItemImageMetadata } from "@/lib/images";
 
 export const Route = createFileRoute("/_authenticated/items/new")({
   head: () => ({
@@ -120,12 +121,21 @@ function NewItem() {
   const saving = useMutation({
     mutationFn: async () => {
       const userId = await requireUserId();
+      const payload = itemPayload(values, extractionMeta);
       const { data, error } = await supabase
         .from("items")
-        .insert({ id: itemId, user_id: userId, ...itemPayload(values, extractionMeta) })
+        .insert({ id: itemId, user_id: userId, ...payload })
         .select("id")
         .single();
       if (error) throw error;
+
+      await syncItemImageMetadata({
+        userId,
+        itemId: data.id,
+        storagePath: payload.image_storage_path ?? null,
+        sourceUrl: payload.primary_image_url ?? null,
+        altText: payload.title,
+      });
 
       if (values.collectionIds.length) {
         const { error: linkError } = await supabase.from("item_collections").insert(
