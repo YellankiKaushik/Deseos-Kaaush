@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,15 +14,15 @@ export const Route = createFileRoute("/auth")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign in — AspireList" },
+      { title: "Sign in — Wishlist" },
       {
         name: "description",
-        content: "Sign in to your private AspireList dashboard and keep planning what's next.",
+        content: "Sign in to your private Wishlist and keep planning what's next.",
       },
-      { property: "og:title", content: "Sign in — AspireList" },
+      { property: "og:title", content: "Sign in — Wishlist" },
       {
         property: "og:description",
-        content: "Sign in to your private AspireList dashboard and keep planning what's next.",
+        content: "Sign in to your private Wishlist and keep planning what's next.",
       },
     ],
   }),
@@ -85,23 +84,24 @@ function AuthPage() {
 
   async function handleGoogle() {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin,
+      },
     });
-    if (result.error) {
+    if (error) {
       setBusy(false);
       toast.error("Google sign-in didn't work. Try again.");
       return;
     }
-    if (result.redirected) return;
-    navigate({ to: "/dashboard", replace: true });
   }
 
   return (
     <div className="flex min-h-screen flex-col">
       <header className="mx-auto flex h-20 w-full max-w-6xl items-center px-5">
         <Link to="/" className="font-display text-xl">
-          Aspire<span className="text-primary">List</span>
+          Wishlist
         </Link>
       </header>
 
