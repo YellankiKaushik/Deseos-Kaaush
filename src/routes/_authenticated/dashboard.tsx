@@ -33,17 +33,17 @@ import {
   type Item,
   type SortValue,
   type ViewMode,
-} from "@/lib/aspire";
+} from "@/lib/wishlist";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — AspireList" },
+      { title: "Dashboard — Wishlist" },
       {
         name: "description",
         content: "Every item you're working towards, in one calm visual board.",
       },
-      { property: "og:title", content: "Dashboard — AspireList" },
+      { property: "og:title", content: "Dashboard — Wishlist" },
       {
         property: "og:description",
         content: "Every item you're working towards, in one calm visual board.",
