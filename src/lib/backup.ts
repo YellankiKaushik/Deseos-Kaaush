@@ -11,6 +11,9 @@ export type BackupFile = {
 export type ImportMode = "merge" | "replace";
 export type ImportSummary = { table: string; restored: number; skipped?: number }[];
 
+export const BACKUP_FORMAT = "wishlist-backup";
+export const LEGACY_BACKUP_FORMAT = "aspirelist-backup";
+
 const ITEM_TABLES = [
   "categories",
   "collections",
@@ -29,7 +32,7 @@ const REPLACE_DELETE_ORDER = [
   "collections",
 ] as const;
 
-/** Throws a readable error when the file isn't an AspireList backup we understand. */
+/** Throws a readable error when the file isn't a Wishlist backup we understand. */
 export function parseBackup(raw: string): BackupFile {
   let parsed: unknown;
   try {
@@ -37,10 +40,11 @@ export function parseBackup(raw: string): BackupFile {
   } catch {
     throw new Error("That file isn't valid JSON.");
   }
-  if (!parsed || typeof parsed !== "object")
-    throw new Error("That file isn't an AspireList backup.");
+  if (!parsed || typeof parsed !== "object") throw new Error("That file isn't a Wishlist backup.");
   const file = parsed as Partial<BackupFile>;
-  if (file.format !== "aspirelist-backup") throw new Error("That file isn't an AspireList backup.");
+  if (file.format !== BACKUP_FORMAT && file.format !== LEGACY_BACKUP_FORMAT) {
+    throw new Error("That file isn't a Wishlist backup.");
+  }
   if (file.version !== 1)
     throw new Error(`Backup version ${String(file.version)} isn't supported.`);
   if (!file.data || typeof file.data !== "object")
@@ -121,7 +125,7 @@ export async function importUserData(
   const summary: ImportSummary = [];
 
   if (mode === "replace" && options.replaceConfirmation !== "REPLACE") {
-    throw new Error("Type REPLACE to replace your current AspireList data.");
+    throw new Error("Type REPLACE to replace your current Wishlist data.");
   }
 
   const settings = file.data["settings"] as Record<string, unknown> | null | undefined;
