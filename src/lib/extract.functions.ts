@@ -3,7 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const extractProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { url: string }) => {
+  .validator((input: { url: string }) => {
     if (!input || typeof input.url !== "string" || input.url.trim().length === 0) {
       throw new Error("A product URL is required");
     }
