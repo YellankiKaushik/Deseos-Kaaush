@@ -32,16 +32,16 @@ import {
   totalsByCurrency,
   formatMoney,
   type SortValue,
-} from "@/lib/aspire";
+} from "@/lib/wishlist";
 import { removeAllItemImages } from "@/lib/images";
 import { fetchItems, requireUserId } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authenticated/purchased")({
   head: () => ({
     meta: [
-      { title: "Achieved — AspireList" },
+      { title: "Achieved — Wishlist" },
       { name: "description", content: "The archive of everything you set out to get, and got." },
-      { property: "og:title", content: "Achieved — AspireList" },
+      { property: "og:title", content: "Achieved — Wishlist" },
       {
         property: "og:description",
         content: "The archive of everything you set out to get, and got.",
