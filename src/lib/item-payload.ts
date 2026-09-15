@@ -1,6 +1,6 @@
 import type { TablesInsert } from "@/integrations/supabase/types";
 import type { ItemFormValues } from "@/components/item-form";
-import { cleanHttpUrl, domainOf, normalizeUrl } from "@/lib/aspire";
+import { cleanHttpUrl, domainOf, normalizeUrl } from "@/lib/wishlist";
 import { intOrNull, numberOrNull } from "@/lib/queries";
 
 export type ExtractionMeta = {
