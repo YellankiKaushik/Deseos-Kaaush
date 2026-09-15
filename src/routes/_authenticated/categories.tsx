@@ -23,12 +23,12 @@ import { fetchCategories, fetchItems, requireUserId } from "@/lib/queries";
 export const Route = createFileRoute("/_authenticated/categories")({
   head: () => ({
     meta: [
-      { title: "Categories — AspireList" },
+      { title: "Categories — Wishlist" },
       {
         name: "description",
         content: "Rename, add, or remove the categories you sort your list by.",
       },
-      { property: "og:title", content: "Categories — AspireList" },
+      { property: "og:title", content: "Categories — Wishlist" },
       {
         property: "og:description",
         content: "Rename, add, or remove the categories you sort your list by.",
