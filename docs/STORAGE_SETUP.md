@@ -1,6 +1,6 @@
 # Storage Setup
 
-AspireList uses one private Supabase Storage bucket:
+Wishlist uses one private Supabase Storage bucket:
 
 ```text
 item-images
