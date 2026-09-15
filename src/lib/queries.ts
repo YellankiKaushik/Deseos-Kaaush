@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Category, Collection, Item, Profile } from "@/lib/aspire";
+import type { Category, Collection, Item, Profile } from "@/lib/wishlist";
 
 export async function fetchItems(): Promise<Item[]> {
   const { data, error } = await supabase
@@ -142,7 +142,7 @@ export async function exportUserData() {
   }
 
   return {
-    format: "aspirelist-backup",
+    format: "wishlist-backup",
     version: 1,
     exportedAt: new Date().toISOString(),
     data: {
