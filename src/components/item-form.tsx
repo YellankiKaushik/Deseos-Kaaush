@@ -37,6 +37,9 @@ export type ItemFormValues = {
   target_purchase_date: string;
   target_budget: string;
   amount_saved: string;
+  purchased_at: string;
+  actual_purchase_price: string;
+  purchase_reflection: string;
   collectionIds: string[];
 };
 
@@ -63,6 +66,9 @@ export const emptyItemForm: ItemFormValues = {
   target_purchase_date: "",
   target_budget: "",
   amount_saved: "",
+  purchased_at: "",
+  actual_purchase_price: "",
+  purchase_reflection: "",
   collectionIds: [],
 };
 
@@ -334,6 +340,42 @@ export function ItemForm({
           </div>
         </div>
       </section>
+
+      {values.status === "purchased" ? (
+        <section className="space-y-4">
+          <h2 className="font-display text-lg">Purchase record</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="purchased_at">Purchase date</Label>
+              <Input
+                id="purchased_at"
+                type="date"
+                value={values.purchased_at}
+                onChange={(e) => set("purchased_at", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="actual_purchase_price">Actual price paid</Label>
+              <Input
+                id="actual_purchase_price"
+                inputMode="decimal"
+                value={values.actual_purchase_price}
+                onChange={(e) => set("actual_purchase_price", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="purchase_reflection">Purchase reflection</Label>
+              <Textarea
+                id="purchase_reflection"
+                rows={3}
+                maxLength={1000}
+                value={values.purchase_reflection}
+                onChange={(e) => set("purchase_reflection", e.target.value)}
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {collections.length ? (
         <section className="space-y-3">
