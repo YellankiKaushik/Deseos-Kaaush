@@ -185,9 +185,7 @@ function Settings() {
     },
     onError: (error) =>
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "Account deletion needs a server service-role key.",
+        error instanceof Error ? error.message : "Account deletion needs a server secret key.",
       ),
   });
 
@@ -360,7 +358,7 @@ function Settings() {
                   <AlertDialogTitle>Delete your account?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This removes your auth account through the server and signs you out. It requires
-                    `SUPABASE_SERVICE_ROLE_KEY` to be configured on the server.
+                    `SUPABASE_SECRET_KEY` to be configured on the server.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <Textarea
