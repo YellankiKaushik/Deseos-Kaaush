@@ -43,8 +43,10 @@ function Categories() {
   const categoriesQuery = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
   const itemsQuery = useQuery({ queryKey: ["items"], queryFn: fetchItems });
   const [name, setName] = useState("");
+  const [icon, setIcon] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [editingIcon, setEditingIcon] = useState("");
 
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -56,11 +58,12 @@ function Categories() {
       const userId = await requireUserId();
       const { error } = await supabase
         .from("categories")
-        .insert({ user_id: userId, name: name.trim() });
+        .insert({ user_id: userId, name: name.trim(), icon: icon.trim() || null });
       if (error) throw error;
     },
     onSuccess: () => {
       setName("");
+      setIcon("");
       refresh();
       toast.success("Category added.");
     },
@@ -72,7 +75,7 @@ function Categories() {
     mutationFn: async () => {
       const { error } = await supabase
         .from("categories")
-        .update({ name: editingName.trim() })
+        .update({ name: editingName.trim(), icon: editingIcon.trim() || null })
         .eq("id", editingId as string);
       if (error) throw error;
     },
@@ -117,7 +120,7 @@ function Categories() {
       </div>
 
       <form
-        className="bg-card elevated flex flex-col gap-3 rounded-2xl border border-border/70 p-6 sm:flex-row sm:items-end"
+        className="bg-card elevated grid gap-3 rounded-2xl border border-border/70 p-6 sm:grid-cols-[minmax(0,1fr)_160px_auto] sm:items-end"
         onSubmit={(event) => {
           event.preventDefault();
           if (!name.trim()) {
@@ -136,6 +139,16 @@ function Categories() {
             onChange={(e) => setName(e.target.value)}
           />
         </div>
+        <div className="space-y-2">
+          <Label htmlFor="category-icon">Icon</Label>
+          <Input
+            id="category-icon"
+            value={icon}
+            maxLength={40}
+            onChange={(e) => setIcon(e.target.value)}
+            placeholder="laptop"
+          />
+        </div>
         <Button type="submit" disabled={creating.isPending}>
           Add
         </Button>
@@ -152,6 +165,13 @@ function Categories() {
                   onChange={(e) => setEditingName(e.target.value)}
                   className="flex-1"
                 />
+                <Input
+                  value={editingIcon}
+                  maxLength={40}
+                  onChange={(e) => setEditingIcon(e.target.value)}
+                  className="w-32"
+                  placeholder="icon"
+                />
                 <Button size="sm" disabled={renaming.isPending} onClick={() => renaming.mutate()}>
                   Save
                 </Button>
@@ -161,6 +181,7 @@ function Categories() {
               </>
             ) : (
               <>
+                <span className="text-muted-foreground w-20 text-xs">{category.icon ?? "—"}</span>
                 <span className="flex-1">{category.name}</span>
                 <span className="text-muted-foreground text-xs">
                   {counts.get(category.id) ?? 0} items
@@ -172,6 +193,7 @@ function Categories() {
                   onClick={() => {
                     setEditingId(category.id);
                     setEditingName(category.name);
+                    setEditingIcon(category.icon ?? "");
                   }}
                 >
                   <Pencil className="size-4" />
