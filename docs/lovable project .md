@@ -22,12 +22,12 @@ The user pastes a webpage URL. The application retrieves as much structured info
 
 The application is not merely a bookmark manager. It combines:
 
-* A universal wishlist  
-* A personal vision board  
-* A purchase-priority system  
-* A savings and acquisition planner  
-* A purchased-goals archive  
-* A searchable private catalogue
+- A universal wishlist
+- A personal vision board
+- A purchase-priority system
+- A savings and acquisition planner
+- A purchased-goals archive
+- A searchable private catalogue
 
 The user should be able to return years later and continue adding, updating, purchasing, archiving, and reorganising items.
 
@@ -37,16 +37,16 @@ The user should be able to return years later and continue adding, updating, pur
 
 Create one application in which the user can:
 
-1. Paste a product or webpage URL.  
-2. Automatically retrieve available product details.  
-3. Review and correct the extracted information.  
-4. Save the item permanently.  
-5. View every desired item in one visual dashboard.  
-6. Organise items into collections and categories.  
-7. Record why the item matters.  
-8. Prioritise and plan the purchase.  
-9. Track savings and purchase status.  
-10. Open the original webpage at any time.  
+1. Paste a product or webpage URL.
+2. Automatically retrieve available product details.
+3. Review and correct the extracted information.
+4. Save the item permanently.
+5. View every desired item in one visual dashboard.
+6. Organise items into collections and categories.
+7. Record why the item matters.
+8. Prioritise and plan the purchase.
+9. Track savings and purchase status.
+10. Open the original webpage at any time.
 11. Retain purchased items as completed achievements.
 
 ---
@@ -57,22 +57,22 @@ The application must not promise perfect extraction from every website.
 
 Websites differ substantially:
 
-* Some expose structured product data.  
-* Some provide only Open Graph metadata.  
-* Some render prices and images using client-side JavaScript.  
-* Some block automated requests.  
-* Some require authentication, cookies, geographic location, or CAPTCHA.  
-* Some prohibit scraping in their terms.  
-* Some change their page structure frequently.
+- Some expose structured product data.
+- Some provide only Open Graph metadata.
+- Some render prices and images using client-side JavaScript.
+- Some block automated requests.
+- Some require authentication, cookies, geographic location, or CAPTCHA.
+- Some prohibit scraping in their terms.
+- Some change their page structure frequently.
 
 The application must therefore use a layered extraction system:
 
-1. Structured JSON-LD product data  
-2. Open Graph metadata  
-3. Standard HTML metadata  
-4. Basic DOM heuristics  
-5. Domain-specific parsers for selected stores  
-6. Optional external browser-rendering or extraction provider  
+1. Structured JSON-LD product data
+2. Open Graph metadata
+3. Standard HTML metadata
+4. Basic DOM heuristics
+5. Domain-specific parsers for selected stores
+6. Optional external browser-rendering or extraction provider
 7. Manual entry and correction fallback
 
 The manual fallback is mandatory. Extraction failure must never prevent a user from saving an item.
@@ -91,15 +91,15 @@ Although the initial user may be one person, all database tables must use `user_
 
 Initial authentication:
 
-* Email and password  
-* Magic link, if easy to configure  
-* Password reset  
-* Sign out
+- Email and password
+- Magic link, if easy to configure
+- Password reset
+- Sign out
 
 Optional later authentication:
 
-* Google OAuth  
-* Apple login
+- Google OAuth
+- Apple login
 
 Users must never be able to view or modify another user’s saved items.
 
@@ -109,37 +109,37 @@ Users must never be able to view or modify another user’s saved items.
 
 ## **Frontend**
 
-* React  
-* TypeScript  
-* Vite  
-* React Router  
-* Tailwind CSS  
-* shadcn/ui  
-* Lucide icons  
-* TanStack Query for server-state management  
-* React Hook Form  
-* Zod validation
+- React
+- TypeScript
+- Vite
+- React Router
+- Tailwind CSS
+- shadcn/ui
+- Lucide icons
+- TanStack Query for server-state management
+- React Hook Form
+- Zod validation
 
 ## **Backend**
 
 Use Supabase through Lovable integration:
 
-* PostgreSQL database  
-* Supabase Auth  
-* Supabase Storage  
-* Supabase Edge Functions  
-* Row Level Security  
-* Database migrations  
-* Scheduled functions later for price refreshing
+- PostgreSQL database
+- Supabase Auth
+- Supabase Storage
+- Supabase Edge Functions
+- Row Level Security
+- Database migrations
+- Scheduled functions later for price refreshing
 
 Supabase provides PostgreSQL, authentication, storage, and Edge Functions. Lovable can generate and deploy Supabase Edge Functions from natural-language requirements. ([Lovable Documentation](https://docs.lovable.dev/integrations/supabase?utm_source=chatgpt.com))
 
 ## **Deployment**
 
-* GitHub as the source repository  
-* Vercel for frontend deployment  
-* Supabase for backend services  
-* Environment variables configured separately in development, preview, and production
+- GitHub as the source repository
+- Vercel for frontend deployment
+- Supabase for backend services
+- Environment variables configured separately in development, preview, and production
 
 Vercel supports Vite applications and environment-specific variables. ([Vercel](https://vercel.com/docs/frameworks/frontend/vite?utm_source=chatgpt.com))
 
@@ -148,39 +148,39 @@ Vercel supports Vite applications and environment-specific variables. ([Vercel](
 # **6\. High-level system architecture**
 
 Browser  
-  |  
-  |-- React application  
-  |      |  
-  |      |-- Authentication UI  
-  |      |-- Dashboard  
-  |      |-- Add-item workflow  
-  |      |-- Item details  
-  |      |-- Collections  
-  |      |-- Settings  
-  |  
-  |-- Supabase client  
-         |  
-         |-- Auth  
-         |-- PostgreSQL  
-         |-- Storage  
-         |-- Row Level Security  
-         |  
-         |-- Edge Function: extract-product  
-         |       |  
-         |       |-- Validate submitted URL  
-         |       |-- Block unsafe/internal addresses  
-         |       |-- Fetch public webpage  
-         |       |-- Parse JSON-LD  
-         |       |-- Parse Open Graph tags  
-         |       |-- Parse HTML metadata  
-         |       |-- Apply store-specific rules  
-         |       |-- Return normalised product data  
-         |  
-         |-- Edge Function: refresh-product  
-                 |  
-                 |-- Re-fetch saved source  
-                 |-- Update current price  
-                 |-- Record price history
+|  
+|-- React application  
+| |  
+| |-- Authentication UI  
+| |-- Dashboard  
+| |-- Add-item workflow  
+| |-- Item details  
+| |-- Collections  
+| |-- Settings  
+|  
+|-- Supabase client  
+|  
+|-- Auth  
+|-- PostgreSQL  
+|-- Storage  
+|-- Row Level Security  
+|  
+|-- Edge Function: extract-product  
+| |  
+| |-- Validate submitted URL  
+| |-- Block unsafe/internal addresses  
+| |-- Fetch public webpage  
+| |-- Parse JSON-LD  
+| |-- Parse Open Graph tags  
+| |-- Parse HTML metadata  
+| |-- Apply store-specific rules  
+| |-- Return normalised product data  
+|  
+|-- Edge Function: refresh-product  
+|  
+|-- Re-fetch saved source  
+|-- Update current price  
+|-- Record price history
 
 ---
 
@@ -188,32 +188,32 @@ Browser
 
 ## **7.1 First-time user**
 
-1. User opens the landing page.  
-2. User selects “Create my dashboard.”  
-3. User creates an account.  
-4. User is redirected to an empty dashboard.  
-5. Empty state explains how to add the first item.  
-6. User pastes a URL.  
-7. Application extracts information.  
-8. User reviews the preview.  
-9. User saves the item.  
+1. User opens the landing page.
+2. User selects “Create my dashboard.”
+3. User creates an account.
+4. User is redirected to an empty dashboard.
+5. Empty state explains how to add the first item.
+6. User pastes a URL.
+7. Application extracts information.
+8. User reviews the preview.
+9. User saves the item.
 10. The first card appears in the dashboard.
 
 ## **7.2 Add item from URL**
 
-1. User clicks “Add item.”  
-2. User pastes a URL.  
-3. Client validates basic URL syntax.  
-4. Client calls the `extract-product` Edge Function.  
-5. Interface displays a loading state.  
-6. Backend validates the URL for security.  
-7. Backend fetches and parses the webpage.  
-8. Backend returns normalised fields and extraction confidence.  
-9. Application displays an editable preview.  
-10. User corrects missing or inaccurate fields.  
-11. User selects category, collection, priority, and status.  
-12. User adds optional personal notes.  
-13. Application saves the item.  
+1. User clicks “Add item.”
+2. User pastes a URL.
+3. Client validates basic URL syntax.
+4. Client calls the `extract-product` Edge Function.
+5. Interface displays a loading state.
+6. Backend validates the URL for security.
+7. Backend fetches and parses the webpage.
+8. Backend returns normalised fields and extraction confidence.
+9. Application displays an editable preview.
+10. User corrects missing or inaccurate fields.
+11. User selects category, collection, priority, and status.
+12. User adds optional personal notes.
+13. Application saves the item.
 14. User is redirected to the item detail page or dashboard.
 
 ## **7.3 Manual item entry**
@@ -222,45 +222,45 @@ Manual entry must be available immediately, not hidden only after an error.
 
 The user can enter:
 
-* Name  
-* Image  
-* Current price  
-* Currency  
-* Store  
-* URL  
-* Brand  
-* Description  
-* Category  
-* Collection  
-* Notes  
-* Priority  
-* Status
+- Name
+- Image
+- Current price
+- Currency
+- Store
+- URL
+- Brand
+- Description
+- Category
+- Collection
+- Notes
+- Priority
+- Status
 
 ## **7.4 Update an item**
 
 The user can:
 
-* Edit any field  
-* Replace the image  
-* Change category  
-* Move between collections  
-* Change priority  
-* Update savings  
-* Mark as purchased  
-* Archive  
-* Delete  
-* Re-run extraction
+- Edit any field
+- Replace the image
+- Change category
+- Move between collections
+- Change priority
+- Update savings
+- Mark as purchased
+- Archive
+- Delete
+- Re-run extraction
 
 ## **7.5 Mark as purchased**
 
 When the user marks an item as purchased:
 
-* Set status to `purchased`  
-* Ask for purchase date  
-* Ask for actual purchase price  
-* Preserve original desired price  
-* Move the item into the Achievements/Purchased view  
-* Do not delete its history
+- Set status to `purchased`
+- Ask for purchase date
+- Ask for actual purchase price
+- Preserve original desired price
+- Move the item into the Achievements/Purchased view
+- Do not delete its history
 
 ---
 
@@ -274,18 +274,18 @@ Route:
 
 Purpose:
 
-* Explain the product  
-* Provide sign-up and sign-in actions  
-* Show a visual demonstration  
-* Avoid exposing private user content
+- Explain the product
+- Provide sign-up and sign-in actions
+- Show a visual demonstration
+- Avoid exposing private user content
 
 Sections:
 
-* Hero  
-* Three-step explanation  
-* Feature summary  
-* Privacy statement  
-* Sign-up CTA
+- Hero
+- Three-step explanation
+- Feature summary
+- Privacy statement
+- Sign-up CTA
 
 Do not overbuild this page during the MVP.
 
@@ -302,12 +302,12 @@ Routes:
 
 Requirements:
 
-* Clear form validation  
-* Password visibility toggle  
-* Loading state  
-* Error messages  
-* Redirect authenticated users to `/dashboard`  
-* Redirect unauthenticated users away from private routes
+- Clear form validation
+- Password visibility toggle
+- Loading state
+- Error messages
+- Redirect authenticated users to `/dashboard`
+- Redirect unauthenticated users away from private routes
 
 ---
 
@@ -321,61 +321,61 @@ Main sections:
 
 ### **Header**
 
-* Logo/application name  
-* Search input  
-* Add Item button  
-* User menu  
-* Mobile navigation control
+- Logo/application name
+- Search input
+- Add Item button
+- User menu
+- Mobile navigation control
 
 ### **Summary area**
 
 Display:
 
-* Total saved items  
-* Total estimated wishlist value  
-* Total purchased items  
-* High-priority item count
+- Total saved items
+- Total estimated wishlist value
+- Total purchased items
+- High-priority item count
 
 Currency totals must not blindly add different currencies. Either:
 
-* Show totals grouped by currency, or  
-* Use a user-selected base currency with later exchange-rate conversion
+- Show totals grouped by currency, or
+- Use a user-selected base currency with later exchange-rate conversion
 
 For MVP, group totals by currency.
 
 ### **Filters**
 
-* All items  
-* Category  
-* Collection  
-* Status  
-* Priority  
-* Store  
-* Price range  
-* Date added
+- All items
+- Category
+- Collection
+- Status
+- Priority
+- Store
+- Price range
+- Date added
 
 ### **Sorting**
 
-* Newest  
-* Oldest  
-* Price: low to high  
-* Price: high to low  
-* Priority  
-* Target date  
-* Recently updated
+- Newest
+- Oldest
+- Price: low to high
+- Price: high to low
+- Priority
+- Target date
+- Recently updated
 
 ### **Display modes**
 
-* Responsive card grid  
-* Compact list view
+- Responsive card grid
+- Compact list view
 
 ### **Empty state**
 
 Display when no items exist:
 
-* Short explanation  
-* Add first item button  
-* Manual entry option
+- Short explanation
+- Add first item button
+- Manual entry option
 
 ---
 
@@ -391,17 +391,17 @@ Recommended flow:
 
 Fields:
 
-* Product URL  
-* Fetch button  
-* Manual entry link
+- Product URL
+- Fetch button
+- Manual entry link
 
 ### **Step 2: Extraction progress**
 
 Show understandable phases:
 
-* Checking link  
-* Reading page information  
-* Preparing preview
+- Checking link
+- Reading page information
+- Preparing preview
 
 Do not display fake progress percentages.
 
@@ -409,34 +409,34 @@ Do not display fake progress percentages.
 
 Fields:
 
-* Product name  
-* Brand  
-* Main image  
-* Additional images  
-* Current price  
-* Original price  
-* Currency  
-* Rating  
-* Review count  
-* Store  
-* Description  
-* Availability  
-* Category  
-* Collection  
-* Priority  
-* Status  
-* Why I want this  
-* Personal notes  
-* Target purchase date  
-* Target budget  
-* Amount saved
+- Product name
+- Brand
+- Main image
+- Additional images
+- Current price
+- Original price
+- Currency
+- Rating
+- Review count
+- Store
+- Description
+- Availability
+- Category
+- Collection
+- Priority
+- Status
+- Why I want this
+- Personal notes
+- Target purchase date
+- Target budget
+- Amount saved
 
 Buttons:
 
-* Save item  
-* Cancel  
-* Retry extraction  
-* Enter manually
+- Save item
+- Cancel
+- Retry extraction
+- Enter manually
 
 ---
 
@@ -448,35 +448,35 @@ Route:
 
 Display:
 
-* Large image gallery  
-* Product name  
-* Brand  
-* Current price  
-* Original price  
-* Discount  
-* Rating  
-* Store  
-* Availability  
-* Original-page button  
-* Personal motivation  
-* Notes  
-* Priority  
-* Status  
-* Category  
-* Collections  
-* Savings progress  
-* Target purchase date  
-* Date added  
-* Last extraction date  
-* Price history, when available
+- Large image gallery
+- Product name
+- Brand
+- Current price
+- Original price
+- Discount
+- Rating
+- Store
+- Availability
+- Original-page button
+- Personal motivation
+- Notes
+- Priority
+- Status
+- Category
+- Collections
+- Savings progress
+- Target purchase date
+- Date added
+- Last extraction date
+- Price history, when available
 
 Actions:
 
-* Edit  
-* Refresh details  
-* Mark purchased  
-* Archive  
-* Delete
+- Edit
+- Refresh details
+- Mark purchased
+- Archive
+- Delete
 
 External links must open safely using:
 
@@ -494,22 +494,22 @@ Routes:
 
 A collection contains:
 
-* Name  
-* Description  
-* Cover image or icon  
-* Item count  
-* Optional target date  
-* Optional total budget
+- Name
+- Description
+- Cover image or icon
+- Item count
+- Optional target date
+- Optional total budget
 
 Examples:
 
-* Technology  
-* Home  
-* Fashion  
-* Travel  
-* Dream Purchases  
-* This Year  
-* Health and Fitness
+- Technology
+- Home
+- Fashion
+- Travel
+- Dream Purchases
+- This Year
+- Health and Fitness
 
 The user must be able to create, rename, reorder, and delete collections.
 
@@ -525,12 +525,12 @@ Route:
 
 Display:
 
-* Purchased items  
-* Purchase date  
-* Original target price  
-* Actual purchase price  
-* Difference between planned and actual price  
-* Optional reflection note
+- Purchased items
+- Purchase date
+- Original target price
+- Actual purchase price
+- Difference between planned and actual price
+- Optional reflection note
 
 This page is an achievement archive.
 
@@ -554,18 +554,18 @@ Route:
 
 Sections:
 
-* Profile  
-* Default currency  
-* Default dashboard view  
-* Theme  
-* Data export  
-* Account deletion
+- Profile
+- Default currency
+- Default dashboard view
+- Theme
+- Data export
+- Account deletion
 
 Optional later:
 
-* Price refresh frequency  
-* Notification preferences  
-* Public/private profile settings
+- Price refresh frequency
+- Notification preferences
+- Public/private profile settings
 
 ---
 
@@ -580,14 +580,14 @@ Use PostgreSQL enums only when values are very stable. Otherwise use validated t
 ## **9.1 Profiles table**
 
 create table public.profiles (  
-  id uuid primary key references auth.users(id) on delete cascade,  
-  display\_name text,  
-  avatar\_url text,  
-  default\_currency text not null default 'INR',  
-  default\_view text not null default 'grid',  
-  theme text not null default 'system',  
-  created\_at timestamptz not null default now(),  
-  updated\_at timestamptz not null default now()  
+id uuid primary key references auth.users(id) on delete cascade,  
+display\_name text,  
+avatar\_url text,  
+default\_currency text not null default 'INR',  
+default\_view text not null default 'grid',  
+theme text not null default 'system',  
+created\_at timestamptz not null default now(),  
+updated\_at timestamptz not null default now()  
 );
 
 Constraints:
@@ -600,77 +600,77 @@ check (theme in ('system', 'light', 'dark'));
 ## **9.2 Items table**
 
 create table public.items (  
-  id uuid primary key default gen\_random\_uuid(),  
-  user\_id uuid not null references auth.users(id) on delete cascade,
+id uuid primary key default gen\_random\_uuid(),  
+user\_id uuid not null references auth.users(id) on delete cascade,
 
-  source\_url text,  
-  canonical\_url text,  
-  source\_domain text,  
-  store\_name text,
+source\_url text,  
+canonical\_url text,  
+source\_domain text,  
+store\_name text,
 
-  title text not null,  
-  brand text,  
-  description text,
+title text not null,  
+brand text,  
+description text,
 
-  current\_price numeric(14,2),  
-  original\_price numeric(14,2),  
-  currency text,  
-  rating numeric(3,2),  
-  review\_count integer,  
-  availability text,
+current\_price numeric(14,2),  
+original\_price numeric(14,2),  
+currency text,  
+rating numeric(3,2),  
+review\_count integer,  
+availability text,
 
-  primary\_image\_url text,  
-  image\_storage\_path text,
+primary\_image\_url text,  
+image\_storage\_path text,
 
-  category\_id uuid references public.categories(id) on delete set null,
+category\_id uuid references public.categories(id) on delete set null,
 
-  priority text not null default 'medium',  
-  status text not null default 'considering',
+priority text not null default 'medium',  
+status text not null default 'considering',
 
-  reason\_for\_wanting text,  
-  personal\_notes text,
+reason\_for\_wanting text,  
+personal\_notes text,
 
-  target\_purchase\_date date,  
-  target\_budget numeric(14,2),  
-  amount\_saved numeric(14,2) not null default 0,
+target\_purchase\_date date,  
+target\_budget numeric(14,2),  
+amount\_saved numeric(14,2) not null default 0,
 
-  extraction\_status text not null default 'manual',  
-  extraction\_confidence numeric(5,2),  
-  extraction\_method text,  
-  extraction\_error text,  
-  last\_checked\_at timestamptz,
+extraction\_status text not null default 'manual',  
+extraction\_confidence numeric(5,2),  
+extraction\_method text,  
+extraction\_error text,  
+last\_checked\_at timestamptz,
 
-  purchased\_at date,  
-  actual\_purchase\_price numeric(14,2),  
-  purchase\_reflection text,
+purchased\_at date,  
+actual\_purchase\_price numeric(14,2),  
+purchase\_reflection text,
 
-  is\_archived boolean not null default false,
+is\_archived boolean not null default false,
 
-  created\_at timestamptz not null default now(),  
-  updated\_at timestamptz not null default now()  
+created\_at timestamptz not null default now(),  
+updated\_at timestamptz not null default now()  
 );
 
 Constraints:
 
 check (priority in ('low', 'medium', 'high', 'dream'));  
 check (  
-  status in (  
-    'considering',  
-    'wanted',  
-    'saving',  
-    'ready\_to\_buy',  
-    'purchased',  
-    'rejected'  
-  )  
+status in (  
+'considering',  
+'wanted',  
+'saving',  
+'ready\_to\_buy',  
+'purchased',  
+'rejected'  
+)  
 );  
 check (  
-  extraction\_status in (  
-    'manual',  
-    'pending',  
-    'success',  
-    'partial',  
-    'failed'  
-  )  
+extraction\_status in (  
+'manual',  
+'pending',  
+'success',  
+'partial',  
+'failed'  
+)  
 );  
 check (current\_price is null or current\_price \>= 0);  
 check (original\_price is null or original\_price \>= 0);  
@@ -690,14 +690,14 @@ create index items\_canonical\_url\_idx on public.items(user\_id, canonical\_url
 ## **9.3 Item images table**
 
 create table public.item\_images (  
-  id uuid primary key default gen\_random\_uuid(),  
-  item\_id uuid not null references public.items(id) on delete cascade,  
-  user\_id uuid not null references auth.users(id) on delete cascade,  
-  source\_url text,  
-  storage\_path text,  
-  alt\_text text,  
-  position integer not null default 0,  
-  created\_at timestamptz not null default now()  
+id uuid primary key default gen\_random\_uuid(),  
+item\_id uuid not null references public.items(id) on delete cascade,  
+user\_id uuid not null references auth.users(id) on delete cascade,  
+source\_url text,  
+storage\_path text,  
+alt\_text text,  
+position integer not null default 0,  
+created\_at timestamptz not null default now()  
 );
 
 ---
@@ -705,25 +705,25 @@ create table public.item\_images (
 ## **9.4 Categories table**
 
 create table public.categories (  
-  id uuid primary key default gen\_random\_uuid(),  
-  user\_id uuid not null references auth.users(id) on delete cascade,  
-  name text not null,  
-  icon text,  
-  created\_at timestamptz not null default now(),  
-  unique(user\_id, name)  
+id uuid primary key default gen\_random\_uuid(),  
+user\_id uuid not null references auth.users(id) on delete cascade,  
+name text not null,  
+icon text,  
+created\_at timestamptz not null default now(),  
+unique(user\_id, name)  
 );
 
 Seed common categories for each new user:
 
-* Technology  
-* Fashion  
-* Home  
-* Travel  
-* Fitness  
-* Education  
-* Vehicle  
-* Experience  
-* Other
+- Technology
+- Fashion
+- Home
+- Travel
+- Fitness
+- Education
+- Vehicle
+- Experience
+- Other
 
 Do not make global categories mandatory. Users must be able to customise them.
 
@@ -732,16 +732,16 @@ Do not make global categories mandatory. Users must be able to customise them.
 ## **9.5 Collections table**
 
 create table public.collections (  
-  id uuid primary key default gen\_random\_uuid(),  
-  user\_id uuid not null references auth.users(id) on delete cascade,  
-  name text not null,  
-  description text,  
-  cover\_image\_url text,  
-  target\_date date,  
-  target\_budget numeric(14,2),  
-  position integer not null default 0,  
-  created\_at timestamptz not null default now(),  
-  updated\_at timestamptz not null default now()  
+id uuid primary key default gen\_random\_uuid(),  
+user\_id uuid not null references auth.users(id) on delete cascade,  
+name text not null,  
+description text,  
+cover\_image\_url text,  
+target\_date date,  
+target\_budget numeric(14,2),  
+position integer not null default 0,  
+created\_at timestamptz not null default now(),  
+updated\_at timestamptz not null default now()  
 );
 
 ---
@@ -751,11 +751,11 @@ create table public.collections (
 An item can belong to multiple collections.
 
 create table public.item\_collections (  
-  item\_id uuid not null references public.items(id) on delete cascade,  
-  collection\_id uuid not null references public.collections(id) on delete cascade,  
-  user\_id uuid not null references auth.users(id) on delete cascade,  
-  created\_at timestamptz not null default now(),  
-  primary key (item\_id, collection\_id)  
+item\_id uuid not null references public.items(id) on delete cascade,  
+collection\_id uuid not null references public.collections(id) on delete cascade,  
+user\_id uuid not null references auth.users(id) on delete cascade,  
+created\_at timestamptz not null default now(),  
+primary key (item\_id, collection\_id)  
 );
 
 ---
@@ -763,13 +763,13 @@ create table public.item\_collections (
 ## **9.7 Price history table**
 
 create table public.price\_history (  
-  id uuid primary key default gen\_random\_uuid(),  
-  item\_id uuid not null references public.items(id) on delete cascade,  
-  user\_id uuid not null references auth.users(id) on delete cascade,  
-  price numeric(14,2) not null,  
-  currency text not null,  
-  availability text,  
-  checked\_at timestamptz not null default now()  
+id uuid primary key default gen\_random\_uuid(),  
+item\_id uuid not null references public.items(id) on delete cascade,  
+user\_id uuid not null references auth.users(id) on delete cascade,  
+price numeric(14,2) not null,  
+currency text not null,  
+availability text,  
+checked\_at timestamptz not null default now()  
 );
 
 Index:
@@ -782,19 +782,19 @@ on public.price\_history(item\_id, checked\_at desc);
 ## **9.8 Extraction logs table**
 
 create table public.extraction\_logs (  
-  id uuid primary key default gen\_random\_uuid(),  
-  user\_id uuid not null references auth.users(id) on delete cascade,  
-  item\_id uuid references public.items(id) on delete set null,  
-  requested\_url text not null,  
-  resolved\_url text,  
-  domain text,  
-  status text not null,  
-  method text,  
-  fields\_found jsonb not null default '{}'::jsonb,  
-  error\_code text,  
-  error\_message text,  
-  duration\_ms integer,  
-  created\_at timestamptz not null default now()  
+id uuid primary key default gen\_random\_uuid(),  
+user\_id uuid not null references auth.users(id) on delete cascade,  
+item\_id uuid references public.items(id) on delete set null,  
+requested\_url text not null,  
+resolved\_url text,  
+domain text,  
+status text not null,  
+method text,  
+fields\_found jsonb not null default '{}'::jsonb,  
+error\_code text,  
+error\_message text,  
+duration\_ms integer,  
+created\_at timestamptz not null default now()  
 );
 
 Do not expose raw extraction logs in the normal UI. They are for debugging.
@@ -832,13 +832,13 @@ using (auth.uid() \= user\_id);
 
 Create equivalent policies for:
 
-* Profiles  
-* Categories  
-* Collections  
-* Item collections  
-* Item images  
-* Price history  
-* Extraction logs
+- Profiles
+- Categories
+- Collections
+- Item collections
+- Item images
+- Price history
+- Extraction logs
 
 Never rely only on frontend filtering.
 
@@ -855,7 +855,7 @@ extract-product
 ## **11.2 Request**
 
 {  
-  "url": "https://example.com/product/example-item"  
+"url": "https://example.com/product/example-item"  
 }
 
 The function must derive the user identity from the authenticated request. Do not accept `user_id` as a trusted request parameter.
@@ -863,58 +863,58 @@ The function must derive the user identity from the authenticated request. Do no
 ## **11.3 Successful response**
 
 {  
-  "success": true,  
-  "data": {  
-    "requestedUrl": "https://example.com/product/example-item",  
-    "resolvedUrl": "https://example.com/product/example-item",  
-    "canonicalUrl": "https://example.com/product/example-item",  
-    "domain": "example.com",  
-    "storeName": "Example",  
-    "title": "Example Product",  
-    "brand": "Example Brand",  
-    "description": "Product description",  
-    "currentPrice": 24999,  
-    "originalPrice": 29999,  
-    "currency": "INR",  
-    "rating": 4.4,  
-    "reviewCount": 182,  
-    "availability": "in\_stock",  
-    "images": \[  
-      "https://example.com/image-1.jpg"  
-    \],  
-    "extractionMethod": "json\_ld",  
-    "confidence": 0.91,  
-    "warnings": \[\]  
-  }  
+"success": true,  
+"data": {  
+"requestedUrl": "https://example.com/product/example-item",  
+"resolvedUrl": "https://example.com/product/example-item",  
+"canonicalUrl": "https://example.com/product/example-item",  
+"domain": "example.com",  
+"storeName": "Example",  
+"title": "Example Product",  
+"brand": "Example Brand",  
+"description": "Product description",  
+"currentPrice": 24999,  
+"originalPrice": 29999,  
+"currency": "INR",  
+"rating": 4.4,  
+"reviewCount": 182,  
+"availability": "in\_stock",  
+"images": \[  
+"https://example.com/image-1.jpg"  
+\],  
+"extractionMethod": "json\_ld",  
+"confidence": 0.91,  
+"warnings": \[\]  
+}  
 }
 
 ## **11.4 Partial response**
 
 {  
-  "success": true,  
-  "data": {  
-    "title": "Example Product",  
-    "images": \[  
-      "https://example.com/image.jpg"  
-    \],  
-    "extractionMethod": "open\_graph",  
-    "confidence": 0.55,  
-    "warnings": \[  
-      "Price could not be detected",  
-      "Rating could not be detected"  
-    \]  
-  }  
+"success": true,  
+"data": {  
+"title": "Example Product",  
+"images": \[  
+"https://example.com/image.jpg"  
+\],  
+"extractionMethod": "open\_graph",  
+"confidence": 0.55,  
+"warnings": \[  
+"Price could not be detected",  
+"Rating could not be detected"  
+\]  
+}  
 }
 
 ## **11.5 Failure response**
 
 {  
-  "success": false,  
-  "error": {  
-    "code": "PAGE\_BLOCKED",  
-    "message": "The website did not allow this page to be read."  
-  },  
-  "manualEntryAllowed": true  
+"success": false,  
+"error": {  
+"code": "PAGE\_BLOCKED",  
+"message": "The website did not allow this page to be read."  
+},  
+"manualEntryAllowed": true  
 }
 
 ---
@@ -934,12 +934,12 @@ Prefer HTTPS.
 
 Reject:
 
-* `file:`  
-* `ftp:`  
-* `data:`  
-* `javascript:`  
-* `blob:`  
-* Custom protocols
+- `file:`
+- `ftp:`
+- `data:`
+- `javascript:`
+- `blob:`
+- Custom protocols
 
 ## **12.2 Prevent Server-Side Request Forgery**
 
@@ -947,15 +947,15 @@ This is mandatory.
 
 The extraction function must reject URLs targeting:
 
-* `localhost`  
-* `127.0.0.0/8`  
-* `0.0.0.0`  
-* `::1`  
-* Private IPv4 ranges  
-* Link-local ranges  
-* Cloud metadata IP addresses  
-* Internal hostnames  
-* Non-public DNS resolutions
+- `localhost`
+- `127.0.0.0/8`
+- `0.0.0.0`
+- `::1`
+- Private IPv4 ranges
+- Link-local ranges
+- Cloud metadata IP addresses
+- Internal hostnames
+- Non-public DNS resolutions
 
 Private IPv4 ranges include:
 
@@ -972,11 +972,11 @@ Limit redirects to a small number, such as three.
 
 Use:
 
-* A clear user agent  
-* A request timeout  
-* Maximum response-body size  
-* HTML content-type validation  
-* Redirect limits
+- A clear user agent
+- A request timeout
+- Maximum response-body size
+- HTML content-type validation
+- Redirect limits
 
 Suggested constraints:
 
@@ -994,14 +994,14 @@ Search:
 
 Support:
 
-* Single JSON object  
-* JSON array  
-* `@graph`  
-* `Product`  
-* `Offer`  
-* `AggregateOffer`  
-* `AggregateRating`  
-* Nested product structures
+- Single JSON object
+- JSON array
+- `@graph`
+- `Product`
+- `Offer`
+- `AggregateOffer`
+- `AggregateRating`
+- Nested product structures
 
 Normalise:
 
@@ -1046,11 +1046,11 @@ Use only conservative heuristics.
 
 Examples:
 
-* Common price classes  
-* Elements with `itemprop="price"`  
-* Elements with `itemprop="ratingValue"`  
-* Main page heading  
-* High-resolution primary image
+- Common price classes
+- Elements with `itemprop="price"`
+- Elements with `itemprop="ratingValue"`
+- Main page heading
+- High-resolution primary image
 
 Avoid returning a random number as a price.
 
@@ -1059,8 +1059,8 @@ Avoid returning a random number as a price.
 Create an adapter interface:
 
 interface DomainExtractor {  
-  matches(url: URL): boolean;  
-  extract(document: Document, url: URL): Partial\<ExtractedProduct\>;  
+matches(url: URL): boolean;  
+extract(document: Document, url: URL): Partial\<ExtractedProduct\>;  
 }
 
 Adapters can later be added for frequently used stores.
@@ -1071,15 +1071,15 @@ Do not hardcode the entire application around Amazon, Flipkart, or one retailer.
 
 Normalise:
 
-* Whitespace  
-* HTML entities  
-* Currency symbols  
-* Decimal separators  
-* Relative image URLs  
-* Protocol-relative URLs  
-* Availability values  
-* Duplicate images  
-* Tracking query parameters
+- Whitespace
+- HTML entities
+- Currency symbols
+- Decimal separators
+- Relative image URLs
+- Protocol-relative URLs
+- Availability values
+- Duplicate images
+- Tracking query parameters
 
 ## **12.10 Confidence score**
 
@@ -1099,9 +1099,9 @@ Clamp to:
 
 Display confidence indirectly in the UI:
 
-* High confidence  
-* Check a few details  
-* Most fields need review
+- High confidence
+- Check a few details
+- Most fields need review
 
 Do not present a technical decimal score to normal users.
 
@@ -1115,10 +1115,10 @@ Do not attempt to embed a full browser automation system in the initial Lovable 
 
 MVP behaviour:
 
-1. Attempt server-side HTML extraction.  
-2. Return partial information when possible.  
-3. Let the user correct fields.  
-4. Allow manual image upload.  
+1. Attempt server-side HTML extraction.
+2. Return partial information when possible.
+3. Let the user correct fields.
+4. Allow manual image upload.
 5. Preserve the original URL.
 
 Later, introduce a third-party browser rendering or extraction service behind the Edge Function. Its API key must remain server-side.
@@ -1135,10 +1135,10 @@ Store the remote image URL.
 
 Provide:
 
-* Image preview  
-* Broken-image fallback  
-* Manual image upload  
-* Image URL replacement
+- Image preview
+- Broken-image fallback
+- Manual image upload
+- Image URL replacement
 
 ## **Improved implementation**
 
@@ -1146,15 +1146,15 @@ Optionally copy selected images into Supabase Storage.
 
 Advantages:
 
-* The item remains visually available when the store changes its image URL.  
-* Fewer hotlinking failures.  
-* Better long-term preservation.
+- The item remains visually available when the store changes its image URL.
+- Fewer hotlinking failures.
+- Better long-term preservation.
 
 Risks:
 
-* Storage costs  
-* Copyright and store-policy concerns  
-* Additional image-processing complexity
+- Storage costs
+- Copyright and store-policy concerns
+- Additional image-processing complexity
 
 Recommended storage bucket:
 
@@ -1172,9 +1172,9 @@ Storage policies must enforce user ownership.
 
 Before saving, compare:
 
-1. Canonical URL  
-2. Normalised source URL  
-3. Domain plus retailer product ID, when detected  
+1. Canonical URL
+2. Normalised source URL
+3. Domain plus retailer product ID, when detected
 4. Title plus brand as a weak fallback
 
 When a probable duplicate exists, show:
@@ -1183,9 +1183,9 @@ This item may already be in your dashboard.
 
 Actions:
 
-* View existing item  
-* Save another copy  
-* Cancel
+- View existing item
+- Save another copy
+- Cancel
 
 Do not silently block duplicates.
 
@@ -1195,12 +1195,12 @@ Do not silently block duplicates.
 
 For MVP, use PostgreSQL text search or case-insensitive matching across:
 
-* Title  
-* Brand  
-* Store  
-* Description  
-* Notes  
-* Reason for wanting
+- Title
+- Brand
+- Store
+- Description
+- Notes
+- Reason for wanting
 
 Filters must be reflected in URL search parameters where practical:
 
@@ -1219,9 +1219,9 @@ remaining\_amount \= max(target\_budget \- amount\_saved, 0\)
 Progress:
 
 progress\_percentage \=  
-  target\_budget \> 0  
-    ? min((amount\_saved / target\_budget) \* 100, 100\)  
-    : 0
+target\_budget \> 0  
+? min((amount\_saved / target\_budget) \* 100, 100\)  
+: 0
 
 Do not use the current store price as the savings target unless the user explicitly chooses it.
 
@@ -1231,19 +1231,19 @@ Do not use the current store price as the savings target unless the user explici
 
 When an item is created with a valid price:
 
-* Insert the current price into `price_history`.
+- Insert the current price into `price_history`.
 
 When a refresh finds a new valid price:
 
-* Update `items.current_price`.  
-* Insert a new `price_history` row only when the price or availability changed.  
-* Update `last_checked_at`.
+- Update `items.current_price`.
+- Insert a new `price_history` row only when the price or availability changed.
+- Update `last_checked_at`.
 
 Do not overwrite:
 
-* Original saved price  
-* Target budget  
-* Actual purchase price
+- Original saved price
+- Target budget
+- Actual purchase price
 
 Consider adding an `initial_price` field if historical comparison becomes important.
 
@@ -1259,10 +1259,10 @@ Do not refresh every item every few minutes.
 
 Recommended starting strategy:
 
-* High-priority items: once daily  
-* Other active items: once every three to seven days  
-* Purchased or archived items: never automatically  
-* Failed domains: apply exponential backoff
+- High-priority items: once daily
+- Other active items: once every three to seven days
+- Purchased or archived items: never automatically
+- Failed domains: apply exponential backoff
 
 Process items in batches.
 
@@ -1304,12 +1304,12 @@ Never expose stack traces or internal errors to the user.
 
 Every asynchronous view must have:
 
-* Loading state  
-* Empty state  
-* Success state  
-* Partial success state  
-* Failure state  
-* Retry path
+- Loading state
+- Empty state
+- Success state
+- Partial success state
+- Failure state
+- Retry path
 
 Use skeleton components for dashboard loading.
 
@@ -1325,37 +1325,37 @@ The application should feel aspirational, calm, premium, and personal.
 
 Avoid:
 
-* Overly corporate dashboards  
-* Excessive gradients  
-* Neon colours  
-* Dense tables as the default  
-* Gamification that feels childish  
-* Fake luxury styling  
-* Excessive animation
+- Overly corporate dashboards
+- Excessive gradients
+- Neon colours
+- Dense tables as the default
+- Gamification that feels childish
+- Fake luxury styling
+- Excessive animation
 
 ## **Layout**
 
-* Spacious card grid  
-* Large product images  
-* Strong title hierarchy  
-* Clear price display  
-* Soft neutral surfaces  
-* Responsive sidebar on desktop  
-* Bottom or drawer navigation on mobile
+- Spacious card grid
+- Large product images
+- Strong title hierarchy
+- Clear price display
+- Soft neutral surfaces
+- Responsive sidebar on desktop
+- Bottom or drawer navigation on mobile
 
 ## **Card contents**
 
 Each item card should show:
 
-* Image  
-* Title  
-* Brand or store  
-* Current price  
-* Priority  
-* Status  
-* Optional savings progress  
-* Collection indicators  
-* More-actions menu
+- Image
+- Title
+- Brand or store
+- Current price
+- Priority
+- Status
+- Optional savings progress
+- Collection indicators
+- More-actions menu
 
 Do not overload cards with full descriptions.
 
@@ -1363,10 +1363,10 @@ Do not overload cards with full descriptions.
 
 Design for:
 
-* Mobile: one column  
-* Small tablet: two columns  
-* Desktop: three or four columns  
-* Large desktop: four or five columns based on card width
+- Mobile: one column
+- Small tablet: two columns
+- Desktop: three or four columns
+- Large desktop: four or five columns based on card width
 
 Use consistent card image aspect ratios.
 
@@ -1376,15 +1376,15 @@ Use consistent card image aspect ratios.
 
 Required:
 
-* Semantic HTML  
-* Keyboard-accessible controls  
-* Visible focus states  
-* Form labels  
-* Accessible dialog behaviour  
-* Alt text  
-* Sufficient colour contrast  
-* Screen-reader-friendly validation  
-* Do not communicate status using colour alone
+- Semantic HTML
+- Keyboard-accessible controls
+- Visible focus states
+- Form labels
+- Accessible dialog behaviour
+- Alt text
+- Sufficient colour contrast
+- Screen-reader-friendly validation
+- Do not communicate status using colour alone
 
 All icon-only buttons must have accessible names.
 
@@ -1394,21 +1394,21 @@ All icon-only buttons must have accessible names.
 
 ## **Mandatory controls**
 
-* Row Level Security on all user data  
-* Authentication checks in Edge Functions  
-* No service-role key in the browser  
-* URL protocol allowlist  
-* SSRF protection  
-* Redirect validation  
-* Response-size limit  
-* Request timeout  
-* HTML-only extraction  
-* Input validation with Zod  
-* Output sanitisation  
-* Rate limiting  
-* Safe external-link attributes  
-* Secure secrets storage  
-* No arbitrary script execution
+- Row Level Security on all user data
+- Authentication checks in Edge Functions
+- No service-role key in the browser
+- URL protocol allowlist
+- SSRF protection
+- Redirect validation
+- Response-size limit
+- Request timeout
+- HTML-only extraction
+- Input validation with Zod
+- Output sanitisation
+- Rate limiting
+- Safe external-link attributes
+- Secure secrets storage
+- No arbitrary script execution
 
 ## **Rate limiting**
 
@@ -1437,14 +1437,14 @@ Do not inject webpage markup into React using `dangerouslySetInnerHTML`.
 
 Targets:
 
-* Dashboard remains responsive with at least 500 items.  
-* Paginate or use infinite loading after approximately 30–50 items.  
-* Generate appropriately sized image thumbnails.  
-* Avoid fetching every item’s price history on dashboard load.  
-* Fetch detailed history only on the detail page.  
-* Use indexed queries.  
-* Debounce search input.  
-* Cache stable queries through TanStack Query.
+- Dashboard remains responsive with at least 500 items.
+- Paginate or use infinite loading after approximately 30–50 items.
+- Generate appropriately sized image thumbnails.
+- Avoid fetching every item’s price history on dashboard load.
+- Fetch detailed history only on the detail page.
+- Use indexed queries.
+- Debounce search input.
+- Cache stable queries through TanStack Query.
 
 ---
 
@@ -1452,21 +1452,21 @@ Targets:
 
 Provide a later-phase export feature:
 
-* JSON export  
-* CSV export  
-* Image references  
-* Collections  
-* Notes  
-* Price history
+- JSON export
+- CSV export
+- Image references
+- Collections
+- Notes
+- Price history
 
 Account deletion must clearly explain that it deletes:
 
-* Profile  
-* Items  
-* Collections  
-* Uploaded images  
-* Price history  
-* Extraction logs
+- Profile
+- Items
+- Collections
+- Uploaded images
+- Price history
+- Extraction logs
 
 Use cascading deletion carefully.
 
@@ -1478,19 +1478,19 @@ Do not add invasive analytics during the MVP.
 
 At minimum, retain internal operational information:
 
-* Extraction success rate  
-* Partial extraction rate  
-* Failure reason  
-* Domain  
-* Request duration
+- Extraction success rate
+- Partial extraction rate
+- Failure reason
+- Domain
+- Request duration
 
 Never log:
 
-* Passwords  
-* Authentication tokens  
-* Service-role keys  
-* Complete private headers  
-* Unnecessary personal data
+- Passwords
+- Authentication tokens
+- Service-role keys
+- Complete private headers
+- Unnecessary personal data
 
 ---
 
@@ -1500,56 +1500,56 @@ The MVP is complete only when all of the following work:
 
 ## **Authentication**
 
-* User can create an account.  
-* User can sign in.  
-* User can sign out.  
-* Private routes are protected.  
-* Password reset works.
+- User can create an account.
+- User can sign in.
+- User can sign out.
+- Private routes are protected.
+- Password reset works.
 
 ## **Item extraction**
 
-* User can paste a valid public URL.  
-* Backend attempts extraction.  
-* JSON-LD is supported.  
-* Open Graph metadata is supported.  
-* Extracted information appears in an editable preview.  
-* Extraction errors provide manual entry.  
-* Unsafe URLs are rejected.
+- User can paste a valid public URL.
+- Backend attempts extraction.
+- JSON-LD is supported.
+- Open Graph metadata is supported.
+- Extracted information appears in an editable preview.
+- Extraction errors provide manual entry.
+- Unsafe URLs are rejected.
 
 ## **Item management**
 
-* User can manually create an item.  
-* User can edit an item.  
-* User can delete an item.  
-* User can archive an item.  
-* User can mark an item as purchased.  
-* User can open the source URL.  
-* User can upload or replace an image.
+- User can manually create an item.
+- User can edit an item.
+- User can delete an item.
+- User can archive an item.
+- User can mark an item as purchased.
+- User can open the source URL.
+- User can upload or replace an image.
 
 ## **Dashboard**
 
-* Cards load correctly.  
-* Search works.  
-* Category filter works.  
-* Status filter works.  
-* Priority filter works.  
-* Sorting works.  
-* Mobile layout works.  
-* Empty states work.
+- Cards load correctly.
+- Search works.
+- Category filter works.
+- Status filter works.
+- Priority filter works.
+- Sorting works.
+- Mobile layout works.
+- Empty states work.
 
 ## **Organisation**
 
-* User can create categories.  
-* User can create collections.  
-* User can add an item to multiple collections.  
-* Deleting a collection does not delete its items.
+- User can create categories.
+- User can create collections.
+- User can add an item to multiple collections.
+- Deleting a collection does not delete its items.
 
 ## **Security**
 
-* Users cannot access another account’s data.  
-* Service keys are not present in frontend files.  
-* Extraction function blocks private/internal destinations.  
-* All inputs are validated.
+- Users cannot access another account’s data.
+- Service keys are not present in frontend files.
+- Extraction function blocks private/internal destinations.
+- All inputs are validated.
 
 ---
 
@@ -1557,23 +1557,23 @@ The MVP is complete only when all of the following work:
 
 Do not build these until the core system is stable:
 
-* Social feed  
-* Public profiles  
-* Friend following  
-* Affiliate links  
-* Automated purchasing  
-* Browser extension  
-* Mobile-native application  
-* AI recommendations  
-* AI-generated financial advice  
-* Currency conversion  
-* Complex price alerts  
-* Full browser automation  
-* Store-login support  
-* Ecommerce checkout  
-* Payments  
-* Shared family accounts  
-* Public collection sharing
+- Social feed
+- Public profiles
+- Friend following
+- Affiliate links
+- Automated purchasing
+- Browser extension
+- Mobile-native application
+- AI recommendations
+- AI-generated financial advice
+- Currency conversion
+- Complex price alerts
+- Full browser automation
+- Store-login support
+- Ecommerce checkout
+- Payments
+- Shared family accounts
+- Public collection sharing
 
 ---
 
@@ -1583,27 +1583,27 @@ Do not build these until the core system is stable:
 
 Build:
 
-* Project structure  
-* Design system  
-* Authentication  
-* Protected routes  
-* Database schema  
-* RLS policies  
-* Empty dashboard  
-* Seed categories
+- Project structure
+- Design system
+- Authentication
+- Protected routes
+- Database schema
+- RLS policies
+- Empty dashboard
+- Seed categories
 
 ## **Phase 2: Manual item system**
 
 Build:
 
-* Manual item creation  
-* Item cards  
-* Item detail page  
-* Edit  
-* Delete  
-* Archive  
-* Purchase status  
-* Image upload
+- Manual item creation
+- Item cards
+- Item detail page
+- Edit
+- Delete
+- Archive
+- Purchase status
+- Image upload
 
 Do this before automatic extraction. It guarantees that the product remains usable even when scraping fails.
 
@@ -1611,57 +1611,57 @@ Do this before automatic extraction. It guarantees that the product remains usab
 
 Build:
 
-* `extract-product` Edge Function  
-* URL validation  
-* SSRF protection  
-* JSON-LD parser  
-* Open Graph parser  
-* Preview workflow  
-* Extraction logs  
-* Partial and failed states
+- `extract-product` Edge Function
+- URL validation
+- SSRF protection
+- JSON-LD parser
+- Open Graph parser
+- Preview workflow
+- Extraction logs
+- Partial and failed states
 
 ## **Phase 4: Organisation**
 
 Build:
 
-* Categories  
-* Collections  
-* Search  
-* Filters  
-* Sorting  
-* Dashboard summary
+- Categories
+- Collections
+- Search
+- Filters
+- Sorting
+- Dashboard summary
 
 ## **Phase 5: Planning**
 
 Build:
 
-* Target dates  
-* Target budgets  
-* Savings tracking  
-* Purchased archive  
-* Reflections
+- Target dates
+- Target budgets
+- Savings tracking
+- Purchased archive
+- Reflections
 
 ## **Phase 6: Price tracking**
 
 Build:
 
-* Manual refresh  
-* Price history  
-* Price chart  
-* Scheduled refresh  
-* Failure backoff
+- Manual refresh
+- Price history
+- Price chart
+- Scheduled refresh
+- Failure backoff
 
 ## **Phase 7: Hardening**
 
 Complete:
 
-* Security review  
-* RLS verification  
-* Mobile testing  
-* Accessibility  
-* Performance  
-* Automated tests  
-* Production error handling
+- Security review
+- RLS verification
+- Mobile testing
+- Accessibility
+- Performance
+- Automated tests
+- Production error handling
 
 ---
 
@@ -1671,25 +1671,25 @@ Complete:
 
 Test:
 
-* URL normalisation  
-* Currency parsing  
-* Price parsing  
-* JSON-LD parsing  
-* Open Graph parsing  
-* Availability normalisation  
-* Duplicate detection  
-* Savings calculations
+- URL normalisation
+- Currency parsing
+- Price parsing
+- JSON-LD parsing
+- Open Graph parsing
+- Availability normalisation
+- Duplicate detection
+- Savings calculations
 
 ## **Integration tests**
 
 Test:
 
-* Authenticated item creation  
-* RLS isolation  
-* Collection associations  
-* Item deletion cascade  
-* Extraction response handling  
-* Price-history insertion
+- Authenticated item creation
+- RLS isolation
+- Collection associations
+- Item deletion cascade
+- Extraction response handling
+- Price-history insertion
 
 ## **End-to-end tests**
 
@@ -1697,105 +1697,105 @@ Use Playwright after code export.
 
 Critical scenarios:
 
-1. Sign up and sign in.  
-2. Add an item manually.  
-3. Add an item through a parseable URL.  
-4. Handle an extraction failure.  
-5. Edit an item.  
-6. Add it to a collection.  
-7. Search for it.  
-8. Mark it purchased.  
-9. Archive another item.  
+1. Sign up and sign in.
+2. Add an item manually.
+3. Add an item through a parseable URL.
+4. Handle an extraction failure.
+5. Edit an item.
+6. Add it to a collection.
+7. Search for it.
+8. Mark it purchased.
+9. Archive another item.
 10. Verify another user cannot access it.
 
 ## **Security tests**
 
 Test URLs resolving to:
 
-* Localhost  
-* Private IPv4 addresses  
-* IPv6 loopback  
-* Cloud metadata endpoints  
-* Redirects from public URLs to private addresses  
-* Large files  
-* Non-HTML content  
-* Slow responses
+- Localhost
+- Private IPv4 addresses
+- IPv6 loopback
+- Cloud metadata endpoints
+- Redirects from public URLs to private addresses
+- Large files
+- Non-HTML content
+- Slow responses
 
 ---
 
 # **32\. Suggested repository structure**
 
 src/  
-  components/  
-    auth/  
-    dashboard/  
-    items/  
-    collections/  
-    layout/  
-    shared/  
-    ui/
+components/  
+auth/  
+dashboard/  
+items/  
+collections/  
+layout/  
+shared/  
+ui/
 
-  pages/  
-    LandingPage.tsx  
-    SignInPage.tsx  
-    SignUpPage.tsx  
-    DashboardPage.tsx  
-    AddItemPage.tsx  
-    ItemDetailsPage.tsx  
-    CollectionsPage.tsx  
-    CollectionDetailsPage.tsx  
-    PurchasedPage.tsx  
-    ArchivedPage.tsx  
-    SettingsPage.tsx  
-    NotFoundPage.tsx
+pages/  
+LandingPage.tsx  
+SignInPage.tsx  
+SignUpPage.tsx  
+DashboardPage.tsx  
+AddItemPage.tsx  
+ItemDetailsPage.tsx  
+CollectionsPage.tsx  
+CollectionDetailsPage.tsx  
+PurchasedPage.tsx  
+ArchivedPage.tsx  
+SettingsPage.tsx  
+NotFoundPage.tsx
 
-  hooks/  
-    useAuth.ts  
-    useItems.ts  
-    useCollections.ts  
-    useCategories.ts  
-    useProductExtraction.ts
+hooks/  
+useAuth.ts  
+useItems.ts  
+useCollections.ts  
+useCategories.ts  
+useProductExtraction.ts
 
-  lib/  
-    supabase.ts  
-    queryClient.ts  
-    validation.ts  
-    currency.ts  
-    urls.ts  
-    errors.ts
+lib/  
+supabase.ts  
+queryClient.ts  
+validation.ts  
+currency.ts  
+urls.ts  
+errors.ts
 
-  services/  
-    itemService.ts  
-    collectionService.ts  
-    extractionService.ts
+services/  
+itemService.ts  
+collectionService.ts  
+extractionService.ts
 
-  types/  
-    database.ts  
-    item.ts  
-    extraction.ts
+types/  
+database.ts  
+item.ts  
+extraction.ts
 
-  routes/  
-    AppRouter.tsx  
-    ProtectedRoute.tsx
+routes/  
+AppRouter.tsx  
+ProtectedRoute.tsx
 
 supabase/  
-  functions/  
-    extract-product/  
-      index.ts  
-      parsers/  
-        jsonLd.ts  
-        openGraph.ts  
-        metadata.ts  
-        normalise.ts  
-        security.ts  
-        adapters/  
-  migrations/  
-  seed.sql
+functions/  
+extract-product/  
+index.ts  
+parsers/  
+jsonLd.ts  
+openGraph.ts  
+metadata.ts  
+normalise.ts  
+security.ts  
+adapters/  
+migrations/  
+seed.sql
 
 tests/  
-  unit/  
-  integration/  
-  e2e/
+unit/  
+integration/  
+e2e/
 
 ---
 
@@ -1834,8 +1834,8 @@ Do not commit:
 
 After exporting to GitHub:
 
-1. Import the GitHub repository into Vercel.  
-2. Confirm framework detection as Vite.  
+1. Import the GitHub repository into Vercel.
+2. Confirm framework detection as Vite.
 3. Configure build command:
 
 npm run build
@@ -1844,11 +1844,11 @@ npm run build
 
 dist
 
-5. Add frontend-safe Supabase environment variables.  
-6. Configure SPA route rewrites when required.  
-7. Deploy preview environment.  
-8. Test authentication redirect URLs.  
-9. Add the production domain to Supabase Auth allowed URLs.  
+5. Add frontend-safe Supabase environment variables.
+6. Configure SPA route rewrites when required.
+7. Deploy preview environment.
+8. Test authentication redirect URLs.
+9. Add the production domain to Supabase Auth allowed URLs.
 10. Deploy production.
 
 For a single-page React application, ensure direct navigation to routes such as `/dashboard` and `/items/:id` returns the application entry point rather than a 404\.
@@ -1856,13 +1856,13 @@ For a single-page React application, ensure direct navigation to routes such as 
 Example `vercel.json`:
 
 {  
-  "$schema": "https://openapi.vercel.sh/vercel.json",  
-  "rewrites": \[  
-    {  
-      "source": "/(.\*)",  
-      "destination": "/index.html"  
-    }  
-  \]  
+"$schema": "https://openapi.vercel.sh/vercel.json",  
+"rewrites": \[  
+{  
+"source": "/(.\*)",  
+"destination": "/index.html"  
+}  
+\]  
 }
 
 Confirm this configuration against the final framework and router generated by Lovable. Vercel automatically detects frameworks but also supports explicit project configuration where required. ([Vercel](https://vercel.com/docs/project-configuration?utm_source=chatgpt.com))
@@ -1876,21 +1876,21 @@ Lovable should be connected to GitHub early, not only at the end.
 Workflow:
 
 Lovable  
-   ↓  
+↓  
 GitHub repository  
-   ↓  
+↓  
 Local clone  
-   ↓  
+↓  
 Feature branch  
-   ↓  
+↓  
 Codex-assisted changes  
-   ↓  
+↓  
 Tests and local verification  
-   ↓  
+↓  
 Pull request  
-   ↓  
+↓  
 Vercel preview  
-   ↓  
+↓  
 Production
 
 Commands:
@@ -1918,15 +1918,15 @@ Use Codex for narrow, verifiable tasks instead of asking it to “finish the ent
 
 Recommended task sequence:
 
-1. Audit the repository architecture.  
-2. Audit TypeScript errors.  
-3. Audit Supabase RLS.  
-4. Audit extraction security.  
-5. Add parser tests.  
-6. Add Playwright tests.  
-7. Fix mobile UI defects.  
-8. Optimise database queries.  
-9. Review environment-variable usage.  
+1. Audit the repository architecture.
+2. Audit TypeScript errors.
+3. Audit Supabase RLS.
+4. Audit extraction security.
+5. Add parser tests.
+6. Add Playwright tests.
+7. Fix mobile UI defects.
+8. Optimise database queries.
+9. Review environment-variable usage.
 10. Review the Vercel deployment configuration.
 
 OpenAI describes Codex as capable of working with codebases, implementing features, fixing bugs, and proposing changes. The Codex CLI runs locally against a codebase. ([OpenAI](https://openai.com/index/introducing-codex/?utm_source=chatgpt.com))
@@ -2171,21 +2171,21 @@ The project is not production-ready merely because Lovable displays a working pr
 
 It is production-ready only when:
 
-* Production build succeeds.  
-* Type checking succeeds.  
-* RLS is manually verified.  
-* A second test account cannot read the first account’s data.  
-* Malicious extraction URLs are blocked.  
-* No secret exists in browser JavaScript.  
-* Authentication redirects work on the Vercel domain.  
-* Direct navigation to application routes works.  
-* Manual item entry works when extraction fails.  
-* Mobile layouts are usable.  
-* Database migrations are committed.  
-* Environment-variable documentation is complete.  
-* Critical user journeys have automated tests.  
-* Error logs are inspectable.  
-* Account data can be deleted.
+- Production build succeeds.
+- Type checking succeeds.
+- RLS is manually verified.
+- A second test account cannot read the first account’s data.
+- Malicious extraction URLs are blocked.
+- No secret exists in browser JavaScript.
+- Authentication redirects work on the Vercel domain.
+- Direct navigation to application routes works.
+- Manual item entry works when extraction fails.
+- Mobile layouts are usable.
+- Database migrations are committed.
+- Environment-variable documentation is complete.
+- Critical user journeys have automated tests.
+- Error logs are inspectable.
+- Account data can be deleted.
 
 ---
 
@@ -2197,12 +2197,12 @@ The permanent user-owned item record is the product.
 
 The system must remain useful even when:
 
-* A retailer blocks extraction.  
-* A source URL expires.  
-* A product is removed.  
-* An image breaks.  
-* A price cannot be found.  
-* A store changes its website.
+- A retailer blocks extraction.
+- A source URL expires.
+- A product is removed.
+- An image breaks.
+- A price cannot be found.
+- A store changes its website.
 
 For that reason, editable fields, image uploads, personal notes, collections, purchase planning, and archival history are not secondary features. They are the durable foundation of the application.
 
@@ -2236,17 +2236,17 @@ All personal information must be stored inside the user’s browser using Indexe
 
 The application must not require:
 
-* A paid database  
-* Supabase  
-* Firebase  
-* MongoDB Atlas  
-* A paid authentication provider  
-* A paid storage provider  
-* A paid scraping API  
-* A paid image provider  
-* A paid AI API  
-* A permanent backend server  
-* A monthly subscription
+- A paid database
+- Supabase
+- Firebase
+- MongoDB Atlas
+- A paid authentication provider
+- A paid storage provider
+- A paid scraping API
+- A paid image provider
+- A paid AI API
+- A permanent backend server
+- A monthly subscription
 
 The deployed application must work as a static website.
 
@@ -2264,13 +2264,13 @@ Therefore, AspireList must not depend on any hosting company for ownership of th
 
 The user must be able to:
 
-* Export all application data  
-* Import all application data  
-* Download a backup file  
-* Move the application to another host  
-* Run the application locally  
-* Continue using the application without the extraction Worker  
-* Manually create and edit every item
+- Export all application data
+- Import all application data
+- Download a backup file
+- Move the application to another host
+- Run the application locally
+- Continue using the application without the extraction Worker
+- Manually create and edit every item
 
 The durable asset is the exported source code and backup data, not the free hosting provider.
 
@@ -2282,34 +2282,34 @@ AspireList is a private visual application where a user records everything they 
 
 Examples include:
 
-* Electronics  
-* Fashion  
-* Furniture  
-* Vehicles  
-* Courses  
-* Travel  
-* Experiences  
-* Property ideas  
-* Fitness equipment  
-* Gifts  
-* Career tools  
-* Luxury goals
+- Electronics
+- Fashion
+- Furniture
+- Vehicles
+- Courses
+- Travel
+- Experiences
+- Property ideas
+- Fitness equipment
+- Gifts
+- Career tools
+- Luxury goals
 
 The user may paste a webpage URL.
 
 The application attempts to retrieve:
 
-* Product name  
-* Product image  
-* Price  
-* Currency  
-* Brand  
-* Description  
-* Store  
-* Rating  
-* Review count  
-* Availability  
-* Original URL
+- Product name
+- Product image
+- Price
+- Currency
+- Brand
+- Description
+- Store
+- Rating
+- Review count
+- Availability
+- Original URL
 
 The user reviews and edits the retrieved information before saving it.
 
@@ -2325,14 +2325,14 @@ Automatic extraction is optional assistance.
 
 The application must never become unusable because:
 
-* A store blocks extraction  
-* A product page requires JavaScript  
-* The product is removed  
-* A URL expires  
-* An image stops loading  
-* A price cannot be detected  
-* Cloudflare is unavailable  
-* The user has no internet connection
+- A store blocks extraction
+- A product page requires JavaScript
+- The product is removed
+- A URL expires
+- An image stops loading
+- A price cannot be detected
+- Cloudflare is unavailable
+- The user has no internet connection
 
 ## **4.2 Data belongs to the user**
 
@@ -2342,10 +2342,10 @@ All stored data must be exportable as JSON.
 
 Every main entity must support:
 
-* Create  
-* Read  
-* Update  
-* Delete
+- Create
+- Read
+- Update
+- Delete
 
 ## **4.4 Deletion must be real**
 
@@ -2357,9 +2357,9 @@ The application must show a confirmation before destructive deletion.
 
 A fulfilled item can either be:
 
-* Marked as purchased and preserved as an achievement  
-* Archived  
-* Permanently deleted
+- Marked as purchased and preserved as an achievement
+- Archived
+- Permanently deleted
 
 The application must not automatically delete purchased items.
 
@@ -2404,13 +2404,13 @@ Provides a cleaner interface over IndexedDB.
 
 It supports:
 
-* Local persistence  
-* Indexed queries  
-* Transactions  
-* Database schema versions  
-* CRUD operations  
-* Large collections  
-* Blob storage
+- Local persistence
+- Indexed queries
+- Transactions
+- Database schema versions
+- CRUD operations
+- Large collections
+- Blob storage
 
 ### **React Hook Form and Zod**
 
@@ -2462,30 +2462,30 @@ React Context is permitted only for lightweight application settings. Do not cre
 User browser  
 │  
 ├── React application  
-│   ├── Dashboard  
-│   ├── Add item  
-│   ├── Item details  
-│   ├── Collections  
-│   ├── Purchased items  
-│   ├── Archived items  
-│   ├── Backup and restore  
-│   └── Settings  
+│ ├── Dashboard  
+│ ├── Add item  
+│ ├── Item details  
+│ ├── Collections  
+│ ├── Purchased items  
+│ ├── Archived items  
+│ ├── Backup and restore  
+│ └── Settings  
 │  
 ├── IndexedDB through Dexie.js  
-│   ├── Items  
-│   ├── Collections  
-│   ├── Categories  
-│   ├── Item-collection relations  
-│   ├── Price history  
-│   ├── Stored images  
-│   └── Application settings  
+│ ├── Items  
+│ ├── Collections  
+│ ├── Categories  
+│ ├── Item-collection relations  
+│ ├── Price history  
+│ ├── Stored images  
+│ └── Application settings  
 │  
 └── Optional Cloudflare Worker  
-    ├── URL security validation  
-    ├── HTML retrieval  
-    ├── JSON-LD parsing  
-    ├── Open Graph parsing  
-    └── Normalised metadata response
+├── URL security validation  
+├── HTML retrieval  
+├── JSON-LD parsing  
+├── Open Graph parsing  
+└── Normalised metadata response
 
 The application must not require the Cloudflare Worker to start, load, read data, update data, delete data, export data, or restore data.
 
@@ -2516,73 +2516,73 @@ Never modify an existing released schema without a version upgrade.
 export type ItemPriority \= "low" | "medium" | "high" | "dream";
 
 export type ItemStatus \=  
-  | "considering"  
-  | "wanted"  
-  | "saving"  
-  | "ready\_to\_buy"  
-  | "purchased"  
-  | "rejected";
+| "considering"  
+| "wanted"  
+| "saving"  
+| "ready\_to\_buy"  
+| "purchased"  
+| "rejected";
 
 export type ExtractionStatus \=  
-  | "not\_attempted"  
-  | "pending"  
-  | "success"  
-  | "partial"  
-  | "failed"  
-  | "manual";
+| "not\_attempted"  
+| "pending"  
+| "success"  
+| "partial"  
+| "failed"  
+| "manual";
 
 export interface WishlistItem {  
-  id: string;
+id: string;
 
-  title: string;  
-  brand?: string;  
-  description?: string;
+title: string;  
+brand?: string;  
+description?: string;
 
-  sourceUrl?: string;  
-  canonicalUrl?: string;  
-  sourceDomain?: string;  
-  storeName?: string;
+sourceUrl?: string;  
+canonicalUrl?: string;  
+sourceDomain?: string;  
+storeName?: string;
 
-  currentPrice?: number;  
-  originalPrice?: number;  
-  currency?: string;
+currentPrice?: number;  
+originalPrice?: number;  
+currency?: string;
 
-  initialPrice?: number;  
-  actualPurchasePrice?: number;
+initialPrice?: number;  
+actualPurchasePrice?: number;
 
-  rating?: number;  
-  reviewCount?: number;  
-  availability?: string;
+rating?: number;  
+reviewCount?: number;  
+availability?: string;
 
-  primaryImageId?: string;  
-  remoteImageUrl?: string;
+primaryImageId?: string;  
+remoteImageUrl?: string;
 
-  categoryId?: string;
+categoryId?: string;
 
-  priority: ItemPriority;  
-  status: ItemStatus;
+priority: ItemPriority;  
+status: ItemStatus;
 
-  reasonForWanting?: string;  
-  personalNotes?: string;
+reasonForWanting?: string;  
+personalNotes?: string;
 
-  targetPurchaseDate?: string;  
-  targetBudget?: number;  
-  amountSaved: number;
+targetPurchaseDate?: string;  
+targetBudget?: number;  
+amountSaved: number;
 
-  purchasedAt?: string;  
-  purchaseReflection?: string;
+purchasedAt?: string;  
+purchaseReflection?: string;
 
-  extractionStatus: ExtractionStatus;  
-  extractionMethod?: string;  
-  extractionConfidence?: number;  
-  extractionWarnings?: string\[\];  
-  extractionError?: string;  
-  lastCheckedAt?: string;
+extractionStatus: ExtractionStatus;  
+extractionMethod?: string;  
+extractionConfidence?: number;  
+extractionWarnings?: string\[\];  
+extractionError?: string;  
+lastCheckedAt?: string;
 
-  isArchived: boolean;
+isArchived: boolean;
 
-  createdAt: string;  
-  updatedAt: string;  
+createdAt: string;  
+updatedAt: string;  
 }
 
 ---
@@ -2590,12 +2590,12 @@ export interface WishlistItem {
 ## **9.2 Category model**
 
 export interface Category {  
-  id: string;  
-  name: string;  
-  icon?: string;  
-  position: number;  
-  createdAt: string;  
-  updatedAt: string;  
+id: string;  
+name: string;  
+icon?: string;  
+position: number;  
+createdAt: string;  
+updatedAt: string;  
 }
 
 ---
@@ -2603,15 +2603,15 @@ export interface Category {
 ## **9.3 Collection model**
 
 export interface Collection {  
-  id: string;  
-  name: string;  
-  description?: string;  
-  coverImageId?: string;  
-  targetDate?: string;  
-  targetBudget?: number;  
-  position: number;  
-  createdAt: string;  
-  updatedAt: string;  
+id: string;  
+name: string;  
+description?: string;  
+coverImageId?: string;  
+targetDate?: string;  
+targetBudget?: number;  
+position: number;  
+createdAt: string;  
+updatedAt: string;  
 }
 
 ---
@@ -2619,10 +2619,10 @@ export interface Collection {
 ## **9.4 Item-to-collection relation**
 
 export interface ItemCollection {  
-  id: string;  
-  itemId: string;  
-  collectionId: string;  
-  createdAt: string;  
+id: string;  
+itemId: string;  
+collectionId: string;  
+createdAt: string;  
 }
 
 The relation ID should be deterministic or uniquely generated.
@@ -2634,12 +2634,12 @@ A combination of `itemId` and `collectionId` must not be saved more than once.
 ## **9.5 Price history model**
 
 export interface PriceHistoryRecord {  
-  id: string;  
-  itemId: string;  
-  price: number;  
-  currency: string;  
-  availability?: string;  
-  checkedAt: string;  
+id: string;  
+itemId: string;  
+price: number;  
+currency: string;  
+availability?: string;  
+checkedAt: string;  
 }
 
 ---
@@ -2647,17 +2647,17 @@ export interface PriceHistoryRecord {
 ## **9.6 Image model**
 
 export interface StoredImage {  
-  id: string;  
-  itemId?: string;  
-  collectionId?: string;
+id: string;  
+itemId?: string;  
+collectionId?: string;
 
-  fileName: string;  
-  mimeType: string;  
-  size: number;
+fileName: string;  
+mimeType: string;  
+size: number;
 
-  blob: Blob;
+blob: Blob;
 
-  createdAt: string;  
+createdAt: string;  
 }
 
 Do not save Base64 images inside item records.
@@ -2672,17 +2672,17 @@ export type ThemePreference \= "system" | "light" | "dark";
 export type DashboardView \= "grid" | "list";
 
 export interface AppSettings {  
-  id: "primary";  
-  appName: string;  
-  defaultCurrency: string;  
-  theme: ThemePreference;  
-  defaultView: DashboardView;  
-  showPurchasedOnDashboard: boolean;  
-  showArchivedOnDashboard: boolean;  
-  extractionWorkerUrl?: string;  
-  lastBackupAt?: string;  
-  createdAt: string;  
-  updatedAt: string;  
+id: "primary";  
+appName: string;  
+defaultCurrency: string;  
+theme: ThemePreference;  
+defaultView: DashboardView;  
+showPurchasedOnDashboard: boolean;  
+showArchivedOnDashboard: boolean;  
+extractionWorkerUrl?: string;  
+lastBackupAt?: string;  
+createdAt: string;  
+updatedAt: string;  
 }
 
 ---
@@ -2694,34 +2694,35 @@ Create:
 import Dexie, { type Table } from "dexie";
 
 export class AspireListDatabase extends Dexie {  
-  items\!: Table\<WishlistItem, string\>;  
-  categories\!: Table\<Category, string\>;  
-  collections\!: Table\<Collection, string\>;  
-  itemCollections\!: Table\<ItemCollection, string\>;  
-  priceHistory\!: Table\<PriceHistoryRecord, string\>;  
-  images\!: Table\<StoredImage, string\>;  
-  settings\!: Table\<AppSettings, string\>;
+items\!: Table\<WishlistItem, string\>;  
+categories\!: Table\<Category, string\>;  
+collections\!: Table\<Collection, string\>;  
+itemCollections\!: Table\<ItemCollection, string\>;  
+priceHistory\!: Table\<PriceHistoryRecord, string\>;  
+images\!: Table\<StoredImage, string\>;  
+settings\!: Table\<AppSettings, string\>;
 
-  constructor() {  
-    super("aspirelist");
+constructor() {  
+super("aspirelist");
 
-    this.version(1).stores({  
-      items:  
-        "id, title, brand, storeName, categoryId, priority, status, isArchived, createdAt, updatedAt, sourceDomain, canonicalUrl",  
-      categories:  
-        "id, \&name, position, createdAt, updatedAt",  
-      collections:  
-        "id, \&name, position, createdAt, updatedAt",  
-      itemCollections:  
-        "id, itemId, collectionId, &\[itemId+collectionId\], createdAt",  
-      priceHistory:  
-        "id, itemId, \[itemId+checkedAt\], checkedAt",  
-      images:  
-        "id, itemId, collectionId, createdAt",  
-      settings:  
-        "id"  
-    });  
-  }  
+    this.version(1).stores({
+      items:
+        "id, title, brand, storeName, categoryId, priority, status, isArchived, createdAt, updatedAt, sourceDomain, canonicalUrl",
+      categories:
+        "id, \&name, position, createdAt, updatedAt",
+      collections:
+        "id, \&name, position, createdAt, updatedAt",
+      itemCollections:
+        "id, itemId, collectionId, &\[itemId+collectionId\], createdAt",
+      priceHistory:
+        "id, itemId, \[itemId+checkedAt\], checkedAt",
+      images:
+        "id, itemId, collectionId, createdAt",
+      settings:
+        "id"
+    });
+
+}  
 }
 
 export const db \= new AspireListDatabase();
@@ -2734,95 +2735,95 @@ Indexes must support dashboard filtering without loading every item and manually
 
 src/  
 ├── app/  
-│   ├── App.tsx  
-│   ├── router.tsx  
-│   └── providers.tsx  
+│ ├── App.tsx  
+│ ├── router.tsx  
+│ └── providers.tsx  
 │  
 ├── components/  
-│   ├── layout/  
-│   ├── items/  
-│   ├── collections/  
-│   ├── categories/  
-│   ├── backup/  
-│   ├── settings/  
-│   ├── feedback/  
-│   └── ui/  
+│ ├── layout/  
+│ ├── items/  
+│ ├── collections/  
+│ ├── categories/  
+│ ├── backup/  
+│ ├── settings/  
+│ ├── feedback/  
+│ └── ui/  
 │  
 ├── pages/  
-│   ├── DashboardPage.tsx  
-│   ├── AddItemPage.tsx  
-│   ├── EditItemPage.tsx  
-│   ├── ItemDetailsPage.tsx  
-│   ├── CollectionsPage.tsx  
-│   ├── CollectionDetailsPage.tsx  
-│   ├── CategoriesPage.tsx  
-│   ├── PurchasedPage.tsx  
-│   ├── ArchivedPage.tsx  
-│   ├── BackupPage.tsx  
-│   ├── SettingsPage.tsx  
-│   └── NotFoundPage.tsx  
+│ ├── DashboardPage.tsx  
+│ ├── AddItemPage.tsx  
+│ ├── EditItemPage.tsx  
+│ ├── ItemDetailsPage.tsx  
+│ ├── CollectionsPage.tsx  
+│ ├── CollectionDetailsPage.tsx  
+│ ├── CategoriesPage.tsx  
+│ ├── PurchasedPage.tsx  
+│ ├── ArchivedPage.tsx  
+│ ├── BackupPage.tsx  
+│ ├── SettingsPage.tsx  
+│ └── NotFoundPage.tsx  
 │  
 ├── db/  
-│   ├── database.ts  
-│   ├── migrations.ts  
-│   └── seed.ts  
+│ ├── database.ts  
+│ ├── migrations.ts  
+│ └── seed.ts  
 │  
 ├── repositories/  
-│   ├── itemRepository.ts  
-│   ├── categoryRepository.ts  
-│   ├── collectionRepository.ts  
-│   ├── priceHistoryRepository.ts  
-│   ├── imageRepository.ts  
-│   └── settingsRepository.ts  
+│ ├── itemRepository.ts  
+│ ├── categoryRepository.ts  
+│ ├── collectionRepository.ts  
+│ ├── priceHistoryRepository.ts  
+│ ├── imageRepository.ts  
+│ └── settingsRepository.ts  
 │  
 ├── services/  
-│   ├── extractionService.ts  
-│   ├── backupService.ts  
-│   ├── imageService.ts  
-│   └── duplicateService.ts  
+│ ├── extractionService.ts  
+│ ├── backupService.ts  
+│ ├── imageService.ts  
+│ └── duplicateService.ts  
 │  
 ├── hooks/  
-│   ├── useItems.ts  
-│   ├── useItem.ts  
-│   ├── useCategories.ts  
-│   ├── useCollections.ts  
-│   ├── useImageUrl.ts  
-│   └── useSettings.ts  
+│ ├── useItems.ts  
+│ ├── useItem.ts  
+│ ├── useCategories.ts  
+│ ├── useCollections.ts  
+│ ├── useImageUrl.ts  
+│ └── useSettings.ts  
 │  
 ├── schemas/  
-│   ├── itemSchema.ts  
-│   ├── categorySchema.ts  
-│   ├── collectionSchema.ts  
-│   ├── extractionSchema.ts  
-│   └── backupSchema.ts  
+│ ├── itemSchema.ts  
+│ ├── categorySchema.ts  
+│ ├── collectionSchema.ts  
+│ ├── extractionSchema.ts  
+│ └── backupSchema.ts  
 │  
 ├── types/  
-│   ├── item.ts  
-│   ├── category.ts  
-│   ├── collection.ts  
-│   ├── extraction.ts  
-│   └── backup.ts  
+│ ├── item.ts  
+│ ├── category.ts  
+│ ├── collection.ts  
+│ ├── extraction.ts  
+│ └── backup.ts  
 │  
 ├── utils/  
-│   ├── currency.ts  
-│   ├── dates.ts  
-│   ├── urls.ts  
-│   ├── ids.ts  
-│   ├── calculations.ts  
-│   └── errors.ts  
+│ ├── currency.ts  
+│ ├── dates.ts  
+│ ├── urls.ts  
+│ ├── ids.ts  
+│ ├── calculations.ts  
+│ └── errors.ts  
 │  
 └── main.tsx
 
 worker/  
 ├── src/  
-│   ├── index.ts  
-│   ├── security.ts  
-│   ├── fetchPage.ts  
-│   ├── normalise.ts  
-│   └── parsers/  
-│       ├── jsonLd.ts  
-│       ├── openGraph.ts  
-│       └── standardMetadata.ts  
+│ ├── index.ts  
+│ ├── security.ts  
+│ ├── fetchPage.ts  
+│ ├── normalise.ts  
+│ └── parsers/  
+│ ├── jsonLd.ts  
+│ ├── openGraph.ts  
+│ └── standardMetadata.ts  
 │  
 ├── wrangler.jsonc  
 ├── package.json  
@@ -2837,20 +2838,20 @@ tests/
 
 # **12\. Routes**
 
-/                         Redirect to /dashboard  
-/dashboard                All active items  
-/items/new                Add an item  
-/items/:itemId             View item  
-/items/:itemId/edit        Edit item  
-/collections              View collections  
+/ Redirect to /dashboard  
+/dashboard All active items  
+/items/new Add an item  
+/items/:itemId View item  
+/items/:itemId/edit Edit item  
+/collections View collections  
 /collections/:collectionId  
-/categories               Manage categories  
-/purchased                Purchased items  
-/archived                 Archived items  
-/backup                   Backup and restore  
-/settings                 Application settings  
-/help                     Offline help and limitations  
-/\*                        Not-found page
+/categories Manage categories  
+/purchased Purchased items  
+/archived Archived items  
+/backup Backup and restore  
+/settings Application settings  
+/help Offline help and limitations  
+/\* Not-found page
 
 No authentication routes are required in the local-first version.
 
@@ -2864,15 +2865,15 @@ No authentication routes are required in the local-first version.
 
 The user can create an item through:
 
-* Manual form  
-* URL extraction followed by editable preview  
-* Import from backup
+- Manual form
+- URL extraction followed by editable preview
+- Import from backup
 
 Required fields:
 
-* Title  
-* Priority  
-* Status
+- Title
+- Priority
+- Status
 
 Everything else is optional.
 
@@ -2880,13 +2881,13 @@ Everything else is optional.
 
 The user can read items through:
 
-* Dashboard  
-* Search  
-* Filters  
-* Collection page  
-* Purchased page  
-* Archived page  
-* Item detail page
+- Dashboard
+- Search
+- Filters
+- Collection page
+- Purchased page
+- Archived page
+- Item detail page
 
 ### **Update**
 
@@ -2908,19 +2909,19 @@ and price history. This action cannot be undone.
 Delete the item and related records inside one Dexie transaction.
 
 await db.transaction(  
-  "rw",  
-  \[  
-    db.items,  
-    db.itemCollections,  
-    db.priceHistory,  
-    db.images  
-  \],  
-  async () \=\> {  
-    await db.itemCollections.where("itemId").equals(itemId).delete();  
-    await db.priceHistory.where("itemId").equals(itemId).delete();  
-    await db.images.where("itemId").equals(itemId).delete();  
-    await db.items.delete(itemId);  
-  }  
+"rw",  
+\[  
+db.items,  
+db.itemCollections,  
+db.priceHistory,  
+db.images  
+\],  
+async () \=\> {  
+await db.itemCollections.where("itemId").equals(itemId).delete();  
+await db.priceHistory.where("itemId").equals(itemId).delete();  
+await db.images.where("itemId").equals(itemId).delete();  
+await db.items.delete(itemId);  
+}  
 );
 
 ---
@@ -2929,19 +2930,19 @@ await db.transaction(
 
 The user must be able to:
 
-* Create a category  
-* View categories  
-* Rename a category  
-* Change its icon  
-* Reorder categories  
-* Delete a category
+- Create a category
+- View categories
+- Rename a category
+- Change its icon
+- Reorder categories
+- Delete a category
 
 Deleting a category must not delete items.
 
 When deleting a category:
 
-* Set affected item `categoryId` values to `undefined`  
-* Then delete the category
+- Set affected item `categoryId` values to `undefined`
+- Then delete the category
 
 Use one transaction.
 
@@ -2951,19 +2952,19 @@ Use one transaction.
 
 The user must be able to:
 
-* Create a collection  
-* View a collection  
-* Edit its name and details  
-* Add items  
-* Remove items  
-* Reorder collections  
-* Delete a collection
+- Create a collection
+- View a collection
+- Edit its name and details
+- Add items
+- Remove items
+- Reorder collections
+- Delete a collection
 
 Deleting a collection must:
 
-* Delete item-collection relations  
-* Delete its stored cover image  
-* Preserve the items
+- Delete item-collection relations
+- Delete its stored cover image
+- Preserve the items
 
 ---
 
@@ -2973,10 +2974,10 @@ The application normally creates price-history records automatically.
 
 The user must also be able to:
 
-* View price history  
-* Correct an incorrect record  
-* Delete a price record  
-* Clear all price history for one item
+- View price history
+- Correct an incorrect record
+- Delete a price record
+- Clear all price history for one item
 
 ---
 
@@ -3031,10 +3032,10 @@ User enters a URL.
 
 Validate:
 
-* Must begin with `http://` or `https://`  
-* Must have a valid hostname  
-* Maximum reasonable length  
-* Reject malformed URLs
+- Must begin with `http://` or `https://`
+- Must have a valid hostname
+- Maximum reasonable length
+- Reject malformed URLs
 
 ## **Step 2B: Manual entry**
 
@@ -3044,11 +3045,11 @@ Open the full form immediately.
 
 When link extraction is requested:
 
-1. Send URL to the configured Worker.  
-2. Show a loading state.  
-3. Set a timeout.  
-4. Handle success, partial success or failure.  
-5. Display an editable preview.  
+1. Send URL to the configured Worker.
+2. Show a loading state.
+3. Set a timeout.
+4. Handle success, partial success or failure.
+5. Display an editable preview.
 6. Never save automatically.
 
 ## **Step 4: Review**
@@ -3065,38 +3066,38 @@ Save only after the user explicitly selects `Save item`.
 
 ## **Product information**
 
-* Title  
-* Brand  
-* Description  
-* Store name  
-* Source URL  
-* Current price  
-* Original price  
-* Currency  
-* Rating  
-* Review count  
-* Availability  
-* Product image
+- Title
+- Brand
+- Description
+- Store name
+- Source URL
+- Current price
+- Original price
+- Currency
+- Rating
+- Review count
+- Availability
+- Product image
 
 ## **Personal information**
 
-* Category  
-* Collections  
-* Priority  
-* Status  
-* Why I want this  
-* Personal notes  
-* Target purchase date  
-* Target budget  
-* Amount saved
+- Category
+- Collections
+- Priority
+- Status
+- Why I want this
+- Personal notes
+- Target purchase date
+- Target budget
+- Amount saved
 
 ## **Purchase information**
 
 Only display when status is `purchased`:
 
-* Purchase date  
-* Actual purchase price  
-* Purchase reflection
+- Purchase date
+- Actual purchase price
+- Purchase reflection
 
 ---
 
@@ -3105,66 +3106,66 @@ Only display when status is `purchased`:
 Use Zod.
 
 export const itemFormSchema \= z.object({  
-  title: z  
-    .string()  
-    .trim()  
-    .min(1, "Enter an item name.")  
-    .max(200),
+title: z  
+.string()  
+.trim()  
+.min(1, "Enter an item name.")  
+.max(200),
 
-  brand: z.string().trim().max(120).optional(),  
-  description: z.string().trim().max(5000).optional(),
+brand: z.string().trim().max(120).optional(),  
+description: z.string().trim().max(5000).optional(),
 
-  sourceUrl: z  
-    .string()  
-    .trim()  
-    .url()  
-    .refine(  
-      value \=\>  
-        value.startsWith("https://") ||  
-        value.startsWith("http://"),  
-      "Use an HTTP or HTTPS link."  
-    )  
-    .optional()  
-    .or(z.literal("")),
+sourceUrl: z  
+.string()  
+.trim()  
+.url()  
+.refine(  
+value \=\>  
+value.startsWith("https://") ||  
+value.startsWith("http://"),  
+"Use an HTTP or HTTPS link."  
+)  
+.optional()  
+.or(z.literal("")),
 
-  currentPrice: z.number().nonnegative().optional(),  
-  originalPrice: z.number().nonnegative().optional(),
+currentPrice: z.number().nonnegative().optional(),  
+originalPrice: z.number().nonnegative().optional(),
 
-  currency: z  
-    .string()  
-    .trim()  
-    .length(3)  
-    .transform(value \=\> value.toUpperCase())  
-    .optional(),
+currency: z  
+.string()  
+.trim()  
+.length(3)  
+.transform(value \=\> value.toUpperCase())  
+.optional(),
 
-  rating: z.number().min(0).max(5).optional(),  
-  reviewCount: z.number().int().nonnegative().optional(),
+rating: z.number().min(0).max(5).optional(),  
+reviewCount: z.number().int().nonnegative().optional(),
 
-  priority: z.enum(\["low", "medium", "high", "dream"\]),
+priority: z.enum(\["low", "medium", "high", "dream"\]),
 
-  status: z.enum(\[  
-    "considering",  
-    "wanted",  
-    "saving",  
-    "ready\_to\_buy",  
-    "purchased",  
-    "rejected"  
-  \]),
+status: z.enum(\[  
+"considering",  
+"wanted",  
+"saving",  
+"ready\_to\_buy",  
+"purchased",  
+"rejected"  
+\]),
 
-  amountSaved: z.number().nonnegative().default(0),  
-  targetBudget: z.number().nonnegative().optional(),
+amountSaved: z.number().nonnegative().default(0),  
+targetBudget: z.number().nonnegative().optional(),
 
-  reasonForWanting: z.string().trim().max(2000).optional(),  
-  personalNotes: z.string().trim().max(5000).optional()  
+reasonForWanting: z.string().trim().max(2000).optional(),  
+personalNotes: z.string().trim().max(5000).optional()  
 });
 
 Additional rules:
 
-* `originalPrice` may be lower than `currentPrice`; do not block save, but show a warning.  
-* `amountSaved` may exceed `targetBudget`; cap only the visual progress bar.  
-* Purchase date is required when an item is marked purchased.  
-* Actual purchase price is optional.  
-* Empty strings must be converted to `undefined` before storage.
+- `originalPrice` may be lower than `currentPrice`; do not block save, but show a warning.
+- `amountSaved` may exceed `targetBudget`; cap only the visual progress bar.
+- Purchase date is required when an item is marked purchased.
+- Actual purchase price is optional.
+- Empty strings must be converted to `undefined` before storage.
 
 ---
 
@@ -3174,10 +3175,10 @@ Additional rules:
 
 Display:
 
-* Active items  
-* High-priority items  
-* Saving items  
-* Purchased items
+- Active items
+- High-priority items
+- Saving items
+- Purchased items
 
 Display wishlist totals grouped by currency.
 
@@ -3197,61 +3198,61 @@ Never add unrelated currencies together.
 
 Each card shows:
 
-* Image  
-* Title  
-* Brand or store  
-* Price  
-* Priority  
-* Status  
-* Savings progress when applicable  
-* Collection badges  
-* More-actions menu
+- Image
+- Title
+- Brand or store
+- Price
+- Priority
+- Status
+- Savings progress when applicable
+- Collection badges
+- More-actions menu
 
 ## **Card actions**
 
-* View  
-* Edit  
-* Mark purchased  
-* Archive  
-* Delete
+- View
+- Edit
+- Mark purchased
+- Archive
+- Delete
 
 ## **Search fields**
 
 Search:
 
-* Title  
-* Brand  
-* Store  
-* Description  
-* Personal notes  
-* Reason for wanting
+- Title
+- Brand
+- Store
+- Description
+- Personal notes
+- Reason for wanting
 
 ## **Filters**
 
-* Status  
-* Priority  
-* Category  
-* Collection  
-* Store  
-* Price range  
-* Currency  
-* Date added
+- Status
+- Priority
+- Category
+- Collection
+- Store
+- Price range
+- Currency
+- Date added
 
 ## **Sorting**
 
-* Newest  
-* Oldest  
-* Recently updated  
-* Price low to high  
-* Price high to low  
-* Priority  
-* Target purchase date  
-* Alphabetical
+- Newest
+- Oldest
+- Recently updated
+- Price low to high
+- Price high to low
+- Priority
+- Target purchase date
+- Alphabetical
 
 ## **Views**
 
-* Grid  
-* List
+- Grid
+- List
 
 Persist the selected view in settings.
 
@@ -3264,14 +3265,14 @@ Use Dexie’s `useLiveQuery` where suitable.
 Example:
 
 const items \= useLiveQuery(  
-  () \=\>  
-    db.items  
-      .where("isArchived")  
-      .equals(0)  
-      .reverse()  
-      .sortBy("createdAt"),  
-  \[\],  
-  \[\]  
+() \=\>  
+db.items  
+.where("isArchived")  
+.equals(0)  
+.reverse()  
+.sortBy("createdAt"),  
+\[\],  
+\[\]  
 );
 
 Do not copy the complete database into global React state.
@@ -3280,11 +3281,11 @@ The database is the source of truth.
 
 React state should hold only temporary interface state such as:
 
-* Open dialog  
-* Current filter  
-* Form values  
-* Selected card  
-* Search term
+- Open dialog
+- Current filter
+- Form values
+- Selected card
+- Search term
 
 ---
 
@@ -3297,37 +3298,37 @@ Create repository functions.
 Example:
 
 export async function createItem(  
-  input: CreateWishlistItemInput  
+input: CreateWishlistItemInput  
 ): Promise\<WishlistItem\> {  
-  const timestamp \= new Date().toISOString();
+const timestamp \= new Date().toISOString();
 
-  const item: WishlistItem \= {  
-    ...input,  
-    id: crypto.randomUUID(),  
-    amountSaved: input.amountSaved ?? 0,  
-    isArchived: false,  
-    extractionStatus: input.extractionStatus ?? "manual",  
-    createdAt: timestamp,  
-    updatedAt: timestamp  
-  };
+const item: WishlistItem \= {  
+...input,  
+id: crypto.randomUUID(),  
+amountSaved: input.amountSaved ?? 0,  
+isArchived: false,  
+extractionStatus: input.extractionStatus ?? "manual",  
+createdAt: timestamp,  
+updatedAt: timestamp  
+};
 
-  await db.items.add(item);
+await db.items.add(item);
 
-  if (  
-    item.currentPrice \!== undefined &&  
-    item.currency  
-  ) {  
-    await db.priceHistory.add({  
-      id: crypto.randomUUID(),  
-      itemId: item.id,  
-      price: item.currentPrice,  
-      currency: item.currency,  
-      availability: item.availability,  
-      checkedAt: timestamp  
-    });  
-  }
+if (  
+item.currentPrice \!== undefined &&  
+item.currency  
+) {  
+await db.priceHistory.add({  
+id: crypto.randomUUID(),  
+itemId: item.id,  
+price: item.currentPrice,  
+currency: item.currency,  
+availability: item.availability,  
+checkedAt: timestamp  
+});  
+}
 
-  return item;  
+return item;  
 }
 
 Repository functions must throw structured application errors.
@@ -3340,28 +3341,28 @@ Repository functions must throw structured application errors.
 
 The application supports:
 
-* Remote image URL  
-* Local file upload  
-* Image pasted from clipboard, when supported  
-* Existing stored image
+- Remote image URL
+- Local file upload
+- Image pasted from clipboard, when supported
+- Existing stored image
 
 ## **21.2 Recommended priority**
 
-1. User-uploaded local image  
-2. Stored downloaded image  
-3. Remote product image  
+1. User-uploaded local image
+2. Stored downloaded image
+3. Remote product image
 4. Placeholder
 
 ## **21.3 Image resizing**
 
 Before storing a user-uploaded image:
 
-* Validate MIME type  
-* Reject unsupported files  
-* Resize very large images in the browser  
-* Compress to WebP or JPEG  
-* Store the result as a Blob  
-* Preserve acceptable visual quality
+- Validate MIME type
+- Reject unsupported files
+- Resize very large images in the browser
+- Compress to WebP or JPEG
+- Store the result as a Blob
+- Preserve acceptable visual quality
 
 Suggested maximum dimensions:
 
@@ -3393,20 +3394,20 @@ Backup is mandatory, not optional.
 
 Local browser data can be lost when:
 
-* Browser storage is cleared  
-* The browser is uninstalled  
-* The device fails  
-* Private browsing is used  
-* The user switches devices  
-* Storage is automatically evicted  
-* The application origin changes
+- Browser storage is cleared
+- The browser is uninstalled
+- The device fails
+- Private browsing is used
+- The user switches devices
+- Storage is automatically evicted
+- The application origin changes
 
 ## **22.1 Backup formats**
 
 Support:
 
-* Full JSON backup  
-* Human-readable CSV item export
+- Full JSON backup
+- Human-readable CSV item export
 
 JSON is the authoritative restore format.
 
@@ -3415,34 +3416,34 @@ CSV is for viewing and spreadsheet use, not complete restoration.
 ## **22.2 Backup file structure**
 
 export interface AspireListBackup {  
-  format: "aspirelist-backup";  
-  version: 1;  
-  exportedAt: string;  
-  applicationVersion: string;
+format: "aspirelist-backup";  
+version: 1;  
+exportedAt: string;  
+applicationVersion: string;
 
-  data: {  
-    items: WishlistItem\[\];  
-    categories: Category\[\];  
-    collections: Collection\[\];  
-    itemCollections: ItemCollection\[\];  
-    priceHistory: PriceHistoryRecord\[\];  
-    settings: AppSettings\[\];  
-  };
+data: {  
+items: WishlistItem\[\];  
+categories: Category\[\];  
+collections: Collection\[\];  
+itemCollections: ItemCollection\[\];  
+priceHistory: PriceHistoryRecord\[\];  
+settings: AppSettings\[\];  
+};
 
-  images: BackupImage\[\];  
+images: BackupImage\[\];  
 }
 
 Because JSON cannot directly contain Blob objects, encode stored images for backup only.
 
 export interface BackupImage {  
-  id: string;  
-  itemId?: string;  
-  collectionId?: string;  
-  fileName: string;  
-  mimeType: string;  
-  size: number;  
-  base64Data: string;  
-  createdAt: string;  
+id: string;  
+itemId?: string;  
+collectionId?: string;  
+fileName: string;  
+mimeType: string;  
+size: number;  
+base64Data: string;  
+createdAt: string;  
 }
 
 Base64 is acceptable inside downloaded backup files. It should not be used for normal database storage.
@@ -3451,13 +3452,13 @@ Base64 is acceptable inside downloaded backup files. It should not be used for n
 
 Before import:
 
-* Parse JSON safely  
-* Validate the format name  
-* Validate backup version  
-* Validate every entity with Zod  
-* Reject invalid files  
-* Show an import summary  
-* Require confirmation
+- Parse JSON safely
+- Validate the format name
+- Validate backup version
+- Validate every entity with Zod
+- Reject invalid files
+- Show an import summary
+- Require confirmation
 
 ## **22.4 Restore modes**
 
@@ -3469,9 +3470,9 @@ Keep current data and add imported data.
 
 For ID conflicts:
 
-* Preserve existing record by default  
-* Let user choose imported or existing version  
-* Never silently overwrite data
+- Preserve existing record by default
+- Let user choose imported or existing version
+- Never silently overwrite data
 
 ### **Replace everything**
 
@@ -3485,8 +3486,8 @@ REPLACE
 
 Display a non-blocking reminder when:
 
-* More than 30 days have passed since the last backup  
-* More than 20 changes have occurred since the last backup
+- More than 30 days have passed since the last backup
+- More than 20 changes have occurred since the last backup
 
 Do not use notifications or a scheduled server.
 
@@ -3498,10 +3499,10 @@ Configure the application as a PWA after the main CRUD system works.
 
 Benefits:
 
-* Installable on desktop or mobile  
-* App-like icon  
-* Static interface works offline  
-* Faster repeat loading
+- Installable on desktop or mobile
+- App-like icon
+- Static interface works offline
+- Faster repeat loading
 
 Use:
 
@@ -3509,11 +3510,11 @@ vite-plugin-pwa
 
 Cache:
 
-* Application shell  
-* Static JavaScript  
-* Static CSS  
-* Icons  
-* Fonts bundled with the application
+- Application shell
+- Static JavaScript
+- Static CSS
+- Icons
+- Fonts bundled with the application
 
 Do not blindly cache third-party product pages or arbitrary product images.
 
@@ -3533,13 +3534,13 @@ Therefore, use a small Cloudflare Worker.
 
 The Worker must:
 
-1. Receive a public HTTP or HTTPS URL.  
-2. Validate it.  
-3. Block internal network destinations.  
-4. Fetch HTML.  
-5. Parse structured metadata.  
-6. Return normalised JSON.  
-7. Discard the HTML.  
+1. Receive a public HTTP or HTTPS URL.
+2. Validate it.
+3. Block internal network destinations.
+4. Fetch HTML.
+5. Parse structured metadata.
+6. Return normalised JSON.
+7. Discard the HTML.
 8. Store no personal data.
 
 The Worker must not maintain a database.
@@ -3554,64 +3555,64 @@ POST /extract
 Content-Type: application/json
 
 {  
-  "url": "https://example.com/product/item"  
+"url": "https://example.com/product/item"  
 }
 
 ## **Success response**
 
 {  
-  "success": true,  
-  "data": {  
-    "requestedUrl": "https://example.com/product/item",  
-    "resolvedUrl": "https://example.com/product/item",  
-    "canonicalUrl": "https://example.com/product/item",  
-    "domain": "example.com",  
-    "storeName": "Example",  
-    "title": "Example Item",  
-    "brand": "Example Brand",  
-    "description": "Example description",  
-    "currentPrice": 24999,  
-    "originalPrice": 29999,  
-    "currency": "INR",  
-    "rating": 4.4,  
-    "reviewCount": 182,  
-    "availability": "in\_stock",  
-    "images": \[  
-      "https://example.com/image.jpg"  
-    \],  
-    "method": "json\_ld",  
-    "confidence": 0.9,  
-    "warnings": \[\]  
-  }  
+"success": true,  
+"data": {  
+"requestedUrl": "https://example.com/product/item",  
+"resolvedUrl": "https://example.com/product/item",  
+"canonicalUrl": "https://example.com/product/item",  
+"domain": "example.com",  
+"storeName": "Example",  
+"title": "Example Item",  
+"brand": "Example Brand",  
+"description": "Example description",  
+"currentPrice": 24999,  
+"originalPrice": 29999,  
+"currency": "INR",  
+"rating": 4.4,  
+"reviewCount": 182,  
+"availability": "in\_stock",  
+"images": \[  
+"https://example.com/image.jpg"  
+\],  
+"method": "json\_ld",  
+"confidence": 0.9,  
+"warnings": \[\]  
+}  
 }
 
 ## **Partial response**
 
 {  
-  "success": true,  
-  "data": {  
-    "title": "Example Item",  
-    "images": \[  
-      "https://example.com/image.jpg"  
-    \],  
-    "method": "open\_graph",  
-    "confidence": 0.45,  
-    "warnings": \[  
-      "Price could not be detected.",  
-      "Rating could not be detected."  
-    \]  
-  }  
+"success": true,  
+"data": {  
+"title": "Example Item",  
+"images": \[  
+"https://example.com/image.jpg"  
+\],  
+"method": "open\_graph",  
+"confidence": 0.45,  
+"warnings": \[  
+"Price could not be detected.",  
+"Rating could not be detected."  
+\]  
+}  
 }
 
 ## **Failure response**
 
 {  
-  "success": false,  
-  "error": {  
-    "code": "EXTRACTION\_FAILED",  
-    "message": "The page could not be read."  
-  },  
-  "manualEntryAllowed": true  
+"success": false,  
+"error": {  
+"code": "EXTRACTION\_FAILED",  
+"message": "The page could not be read."  
+},  
+"manualEntryAllowed": true  
 }
 
 ---
@@ -3620,38 +3621,38 @@ Content-Type: application/json
 
 Use this order:
 
-1. JSON-LD `Product`  
-2. Schema.org microdata  
-3. Open Graph product metadata  
-4. Standard metadata  
-5. Conservative DOM heuristics  
+1. JSON-LD `Product`
+2. Schema.org microdata
+3. Open Graph product metadata
+4. Standard metadata
+5. Conservative DOM heuristics
 6. Domain-specific adapters added later
 
 ## **JSON-LD fields**
 
 Map:
 
-name                           → title  
-brand.name                     → brand  
-description                    → description  
-image                          → images  
-offers.price                   → currentPrice  
-offers.lowPrice                → currentPrice  
-offers.priceCurrency           → currency  
-offers.availability            → availability  
-aggregateRating.ratingValue    → rating  
-aggregateRating.reviewCount    → reviewCount
+name → title  
+brand.name → brand  
+description → description  
+image → images  
+offers.price → currentPrice  
+offers.lowPrice → currentPrice  
+offers.priceCurrency → currency  
+offers.availability → availability  
+aggregateRating.ratingValue → rating  
+aggregateRating.reviewCount → reviewCount
 
 Support:
 
-* Object  
-* Array  
-* `@graph`  
-* Nested `Product`  
-* `Offer`  
-* `AggregateOffer`  
-* String or object brand  
-* String or array images
+- Object
+- Array
+- `@graph`
+- Nested `Product`
+- `Offer`
+- `AggregateOffer`
+- String or object brand
+- String or array images
 
 ---
 
@@ -3659,13 +3660,13 @@ Support:
 
 The application must explicitly communicate:
 
-* Some websites block automated requests.  
-* Some prices appear only after JavaScript runs.  
-* Some websites require location or login.  
-* Some images reject external loading.  
-* Ratings may not be available.  
-* Extraction can be incorrect.  
-* The user must review all fields.
+- Some websites block automated requests.
+- Some prices appear only after JavaScript runs.
+- Some websites require location or login.
+- Some images reject external loading.
+- Ratings may not be available.
+- Extraction can be incorrect.
+- The user must review all fields.
 
 Do not claim universal compatibility.
 
@@ -3688,17 +3689,17 @@ https:
 
 ## **Reject**
 
-* `localhost`  
-* IPv4 loopback  
-* IPv6 loopback  
-* Private network ranges  
-* Link-local ranges  
-* Cloud metadata addresses  
-* Internal domains  
-* Hostnames resolving to private addresses  
-* Non-HTML files  
-* Excessive redirects  
-* Excessive response size
+- `localhost`
+- IPv4 loopback
+- IPv6 loopback
+- Private network ranges
+- Link-local ranges
+- Cloud metadata addresses
+- Internal domains
+- Hostnames resolving to private addresses
+- Non-HTML files
+- Excessive redirects
+- Excessive response size
 
 ## **Block at minimum**
 
@@ -3746,15 +3747,15 @@ A public extraction Worker can be abused.
 
 Add:
 
-* Maximum request-body size  
-* URL length limit  
-* Request timeout  
-* IP-based rate limiting when available  
-* Basic in-memory or platform rate limiting  
-* Origin checking  
-* No credentials forwarding  
-* No cookie forwarding  
-* No custom request headers from the client
+- Maximum request-body size
+- URL length limit
+- Request timeout
+- IP-based rate limiting when available
+- Basic in-memory or platform rate limiting
+- Origin checking
+- No credentials forwarding
+- No cookie forwarding
+- No custom request headers from the client
 
 The Worker must not send the user’s browser cookies to the target website.
 
@@ -3764,9 +3765,9 @@ The Worker must not send the user’s browser cookies to the target website.
 
 Before saving a new item, compare:
 
-1. Canonical URL  
-2. Normalised source URL  
-3. Source domain plus detected product identifier  
+1. Canonical URL
+2. Normalised source URL
+3. Source domain plus detected product identifier
 4. Normalised title plus brand
 
 URL normalisation should remove common tracking parameters:
@@ -3789,37 +3790,37 @@ This item may already exist.
 
 Actions:
 
-* View existing item  
-* Save another copy  
-* Cancel
+- View existing item
+- Save another copy
+- Cancel
 
 ---
 
 # **31\. Savings calculations**
 
 export function calculateRemainingAmount(  
-  targetBudget?: number,  
-  amountSaved \= 0  
+targetBudget?: number,  
+amountSaved \= 0  
 ): number {  
-  if (\!targetBudget || targetBudget \<= 0\) {  
-    return 0;  
-  }
+if (\!targetBudget || targetBudget \<= 0\) {  
+return 0;  
+}
 
-  return Math.max(targetBudget \- amountSaved, 0);  
+return Math.max(targetBudget \- amountSaved, 0);  
 }
 
 export function calculateSavingsPercentage(  
-  targetBudget?: number,  
-  amountSaved \= 0  
+targetBudget?: number,  
+amountSaved \= 0  
 ): number {  
-  if (\!targetBudget || targetBudget \<= 0\) {  
-    return 0;  
-  }
+if (\!targetBudget || targetBudget \<= 0\) {  
+return 0;  
+}
 
-  return Math.min(  
-    Math.max((amountSaved / targetBudget) \* 100, 0),  
-    100  
-  );  
+return Math.min(  
+Math.max((amountSaved / targetBudget) \* 100, 0),  
+100  
+);  
 }
 
 Never automatically replace the target budget when a product’s online price changes.
@@ -3832,8 +3833,8 @@ Never automatically replace the target budget when a product’s online price ch
 
 When an item is created with:
 
-* Valid current price  
-* Valid currency
+- Valid current price
+- Valid currency
 
 Create an initial price-history record.
 
@@ -3841,10 +3842,10 @@ Create an initial price-history record.
 
 When the user manually refreshes product details:
 
-* Display the new information first  
-* Let the user approve the update  
-* Update current price only after approval  
-* Add a price-history record only when price or availability changed
+- Display the new information first
+- Let the user approve the update
+- Update current price only after approval
+- Add a price-history record only when price or availability changed
 
 Do not automatically refresh products in the MVP.
 
@@ -3858,38 +3859,38 @@ Scheduled price tracking introduces unnecessary backend complexity and can viola
 
 The application should feel:
 
-* Aspirational  
-* Personal  
-* Calm  
-* Modern  
-* Visual  
-* Clean  
-* Premium without fake luxury styling
+- Aspirational
+- Personal
+- Calm
+- Modern
+- Visual
+- Clean
+- Premium without fake luxury styling
 
 Avoid:
 
-* Excessive gradients  
-* Excessive animation  
-* Dense enterprise dashboards  
-* Neon colour schemes  
-* Confetti  
-* Childish gamification  
-* Massive hero sections inside the authenticated application
+- Excessive gradients
+- Excessive animation
+- Dense enterprise dashboards
+- Neon colour schemes
+- Confetti
+- Childish gamification
+- Massive hero sections inside the authenticated application
 
 ## **Desktop layout**
 
-* Collapsible left sidebar  
-* Top search bar  
-* Main visual card grid  
-* Floating or visible Add Item action
+- Collapsible left sidebar
+- Top search bar
+- Main visual card grid
+- Floating or visible Add Item action
 
 ## **Mobile layout**
 
-* Compact header  
-* One-column card grid  
-* Bottom navigation or drawer  
-* Large touch targets  
-* Add button always accessible
+- Compact header
+- One-column card grid
+- Bottom navigation or drawer
+- Large touch targets
+- Add button always accessible
 
 ---
 
@@ -3897,17 +3898,17 @@ Avoid:
 
 Required:
 
-* Semantic HTML  
-* Proper labels  
-* Keyboard navigation  
-* Visible focus indicators  
-* Accessible dialogs  
-* Escape-key dialog closing  
-* Screen-reader form errors  
-* Alt text  
-* Sufficient contrast  
-* Reduced-motion support  
-* Status not represented by colour alone
+- Semantic HTML
+- Proper labels
+- Keyboard navigation
+- Visible focus indicators
+- Accessible dialogs
+- Escape-key dialog closing
+- Screen-reader form errors
+- Alt text
+- Sufficient contrast
+- Reduced-motion support
+- Status not represented by colour alone
 
 Icon-only buttons require `aria-label`.
 
@@ -3939,9 +3940,9 @@ This file is not a valid AspireList backup.
 
 Show a neutral placeholder and actions:
 
-* Upload replacement  
-* Enter another image URL  
-* Remove image
+- Upload replacement
+- Enter another image URL
+- Remove image
 
 Do not expose raw stack traces.
 
@@ -3953,13 +3954,13 @@ Settings must include a Storage section.
 
 Display:
 
-* Number of items  
-* Number of stored images  
-* Approximate stored image size  
-* Last backup date  
-* Database version  
-* Export backup button  
-* Clear all data button
+- Number of items
+- Number of stored images
+- Approximate stored image size
+- Last backup date
+- Database version
+- Export backup button
+- Clear all data button
 
 Where supported, display estimated browser-storage usage using:
 
@@ -4007,16 +4008,16 @@ The application should remain responsive with at least:
 
 Requirements:
 
-* Indexed queries  
-* Paginated dashboard  
-* Load 30–50 cards initially  
-* Lazy-load additional cards  
-* Debounced search  
-* Thumbnail-sized images  
-* No full price-history load on dashboard  
-* No complete database copy in React state  
-* Memoise expensive derived calculations  
-* Clean up Blob object URLs
+- Indexed queries
+- Paginated dashboard
+- Load 30–50 cards initially
+- Lazy-load additional cards
+- Debounced search
+- Thumbnail-sized images
+- No full price-history load on dashboard
+- No complete database copy in React state
+- Memoise expensive derived calculations
+- Clean up Blob object URLs
 
 ---
 
@@ -4028,17 +4029,17 @@ Use Vitest.
 
 Test:
 
-* Item validation  
-* URL normalisation  
-* Price calculations  
-* Savings calculations  
-* Duplicate matching  
-* Backup validation  
-* Backup migration  
-* JSON-LD parsing  
-* Open Graph parsing  
-* Currency formatting  
-* Cascade deletion logic
+- Item validation
+- URL normalisation
+- Price calculations
+- Savings calculations
+- Duplicate matching
+- Backup validation
+- Backup migration
+- JSON-LD parsing
+- Open Graph parsing
+- Currency formatting
+- Cascade deletion logic
 
 ## **Component tests**
 
@@ -4046,12 +4047,12 @@ Use React Testing Library.
 
 Test:
 
-* Item form  
-* Delete dialog  
-* Filter controls  
-* Empty state  
-* Backup import summary  
-* Broken image state
+- Item form
+- Delete dialog
+- Filter controls
+- Empty state
+- Backup import summary
+- Broken image state
 
 ## **End-to-end tests**
 
@@ -4059,19 +4060,19 @@ Use Playwright locally after Lovable export.
 
 Test:
 
-1. Create an item manually.  
-2. View the item.  
-3. Edit the item.  
-4. Archive and restore the item.  
-5. Mark the item purchased.  
-6. Delete the item.  
-7. Create and delete a category.  
-8. Create and delete a collection.  
-9. Export a backup.  
-10. Clear the database.  
-11. Restore the backup.  
-12. Attempt a failed extraction.  
-13. Complete manual fallback.  
+1. Create an item manually.
+2. View the item.
+3. Edit the item.
+4. Archive and restore the item.
+5. Mark the item purchased.
+6. Delete the item.
+7. Create and delete a category.
+8. Create and delete a collection.
+9. Export a backup.
+10. Clear the database.
+11. Restore the backup.
+12. Attempt a failed extraction.
+13. Complete manual fallback.
 14. Verify data remains after page reload.
 
 ---
@@ -4093,13 +4094,13 @@ dist
 Add `vercel.json`:
 
 {  
-  "$schema": "https://openapi.vercel.sh/vercel.json",  
-  "rewrites": \[  
-    {  
-      "source": "/(.\*)",  
-      "destination": "/index.html"  
-    }  
-  \]  
+"$schema": "https://openapi.vercel.sh/vercel.json",  
+"rewrites": \[  
+{  
+"source": "/(.\*)",  
+"destination": "/index.html"  
+}  
+\]  
 }
 
 This prevents direct route navigation from returning a 404\.
@@ -4139,16 +4140,16 @@ npm run dev
 Required scripts:
 
 {  
-  "scripts": {  
-    "dev": "vite",  
-    "build": "tsc \-b && vite build",  
-    "preview": "vite preview",  
-    "lint": "eslint .",  
-    "typecheck": "tsc \--noEmit",  
-    "test": "vitest run",  
-    "test:watch": "vitest",  
-    "test:e2e": "playwright test"  
-  }  
+"scripts": {  
+"dev": "vite",  
+"build": "tsc \-b && vite build",  
+"preview": "vite preview",  
+"lint": "eslint .",  
+"typecheck": "tsc \--noEmit",  
+"test": "vitest run",  
+"test:watch": "vitest",  
+"test:e2e": "playwright test"  
+}  
 }
 
 Before deployment:
@@ -4168,15 +4169,15 @@ That produces broken code and wastes credits.
 
 Use these rules:
 
-1. Put this entire document into Project Knowledge.  
-2. Use one implementation prompt per phase.  
-3. Tell Lovable not to modify unrelated files.  
-4. Tell Lovable to inspect existing code before generating.  
-5. Do not repeatedly request visual redesigns.  
-6. Complete data architecture before polishing.  
-7. Export to GitHub early.  
-8. Use Codex locally after the core Lovable build.  
-9. Do not ask Lovable to run broad audits after every phase.  
+1. Put this entire document into Project Knowledge.
+2. Use one implementation prompt per phase.
+3. Tell Lovable not to modify unrelated files.
+4. Tell Lovable to inspect existing code before generating.
+5. Do not repeatedly request visual redesigns.
+6. Complete data architecture before polishing.
+7. Export to GitHub early.
+8. Use Codex locally after the core Lovable build.
+9. Do not ask Lovable to run broad audits after every phase.
 10. Create a Git commit after every working phase.
 
 ---
@@ -4187,13 +4188,13 @@ Use these rules:
 
 Build:
 
-* Routes  
-* Sidebar  
-* Mobile navigation  
-* Dashboard shell  
-* Theme support  
-* Empty states  
-* Not-found page
+- Routes
+- Sidebar
+- Mobile navigation
+- Dashboard shell
+- Theme support
+- Empty states
+- Not-found page
 
 Do not build extraction.
 
@@ -4201,100 +4202,100 @@ Do not build extraction.
 
 Build:
 
-* Dexie database  
-* TypeScript models  
-* Repository layer  
-* Seed categories  
-* Settings  
-* Reactive queries
+- Dexie database
+- TypeScript models
+- Repository layer
+- Seed categories
+- Settings
+- Reactive queries
 
 ## **Phase 3: Manual item CRUD**
 
 Build:
 
-* Create  
-* Read  
-* Update  
-* Delete  
-* Archive  
-* Restore  
-* Purchased state  
-* Rejected state
+- Create
+- Read
+- Update
+- Delete
+- Archive
+- Restore
+- Purchased state
+- Rejected state
 
 ## **Phase 4: Categories and collections CRUD**
 
 Build:
 
-* Category management  
-* Collection management  
-* Many-to-many item relations  
-* Safe collection deletion
+- Category management
+- Collection management
+- Many-to-many item relations
+- Safe collection deletion
 
 ## **Phase 5: Search and dashboard**
 
 Build:
 
-* Search  
-* Filters  
-* Sorting  
-* Summary metrics  
-* Grid and list views  
-* Pagination
+- Search
+- Filters
+- Sorting
+- Summary metrics
+- Grid and list views
+- Pagination
 
 ## **Phase 6: Image storage**
 
 Build:
 
-* File upload  
-* Client-side resize  
-* Blob storage  
-* Broken image fallback  
-* Image replacement  
-* Image deletion
+- File upload
+- Client-side resize
+- Blob storage
+- Broken image fallback
+- Image replacement
+- Image deletion
 
 ## **Phase 7: Backup and restore**
 
 Build:
 
-* JSON export  
-* JSON import  
-* CSV export  
-* Merge mode  
-* Replace mode  
-* Backup validation  
-* Backup reminder
+- JSON export
+- JSON import
+- CSV export
+- Merge mode
+- Replace mode
+- Backup validation
+- Backup reminder
 
 ## **Phase 8: Extraction Worker**
 
 Build:
 
-* Cloudflare Worker  
-* SSRF protection  
-* Metadata parsing  
-* Normalised result  
-* Error handling
+- Cloudflare Worker
+- SSRF protection
+- Metadata parsing
+- Normalised result
+- Error handling
 
 ## **Phase 9: Extraction interface**
 
 Build:
 
-* Paste URL  
-* Loading state  
-* Preview  
-* Manual correction  
-* Duplicate warning  
-* Save
+- Paste URL
+- Loading state
+- Preview
+- Manual correction
+- Duplicate warning
+- Save
 
 ## **Phase 10: Testing and hardening**
 
 Build:
 
-* Unit tests  
-* Component tests  
-* End-to-end tests  
-* Accessibility fixes  
-* Production build fixes  
-* Deployment configuration
+- Unit tests
+- Component tests
+- End-to-end tests
+- Accessibility fixes
+- Production build fixes
+- Deployment configuration
 
 ---
 
@@ -4692,62 +4693,62 @@ The application is complete only when:
 
 ## **Core**
 
-* It runs without a backend.  
-* It works after page refresh.  
-* It works offline except for extraction.  
-* No user data is sent to a database service.  
-* No paid API is required.
+- It runs without a backend.
+- It works after page refresh.
+- It works offline except for extraction.
+- No user data is sent to a database service.
+- No paid API is required.
 
 ## **Item CRUD**
 
-* Create works.  
-* Read works.  
-* Update works.  
-* Delete works.  
-* Related records are safely deleted.  
-* Purchased items can be preserved.  
-* Fulfilled items can be permanently deleted.
+- Create works.
+- Read works.
+- Update works.
+- Delete works.
+- Related records are safely deleted.
+- Purchased items can be preserved.
+- Fulfilled items can be permanently deleted.
 
 ## **Category CRUD**
 
-* Create works.  
-* Read works.  
-* Update works.  
-* Delete works.  
-* Deleting a category preserves items.
+- Create works.
+- Read works.
+- Update works.
+- Delete works.
+- Deleting a category preserves items.
 
 ## **Collection CRUD**
 
-* Create works.  
-* Read works.  
-* Update works.  
-* Delete works.  
-* Deleting a collection preserves items.
+- Create works.
+- Read works.
+- Update works.
+- Delete works.
+- Deleting a collection preserves items.
 
 ## **Backup**
 
-* Full export works.  
-* Full restore works.  
-* Images survive export and restore.  
-* Invalid files cause no database changes.  
-* Merge mode works.  
-* Replace mode works.
+- Full export works.
+- Full restore works.
+- Images survive export and restore.
+- Invalid files cause no database changes.
+- Merge mode works.
+- Replace mode works.
 
 ## **Extraction**
 
-* Manual entry works without extraction.  
-* Worker URL is optional.  
-* Partial extraction can be corrected.  
-* Failed extraction can be ignored.  
-* Unsafe URLs are rejected.
+- Manual entry works without extraction.
+- Worker URL is optional.
+- Partial extraction can be corrected.
+- Failed extraction can be ignored.
+- Unsafe URLs are rejected.
 
 ## **Deployment**
 
-* Production build succeeds.  
-* Direct route navigation works.  
-* Vercel deployment works.  
-* No secret appears in frontend code.  
-* Local clone can run using documented commands.
+- Production build succeeds.
+- Direct route navigation works.
+- Vercel deployment works.
+- No secret appears in frontend code.
+- Local clone can run using documented commands.
 
 ---
 
@@ -4755,17 +4756,17 @@ The application is complete only when:
 
 The local-first version intentionally has these limitations:
 
-* Data is tied to the browser and device until exported.  
-* Clearing browser storage can delete data.  
-* There is no automatic device synchronisation.  
-* There is no account login.  
-* There is no password recovery.  
-* There is no server-side backup.  
-* Link extraction will not work on every store.  
-* Scheduled price tracking is excluded.  
-* Remote image URLs may break.  
-* Browser-storage capacity varies by device.  
-* Private browsing may not preserve data.
+- Data is tied to the browser and device until exported.
+- Clearing browser storage can delete data.
+- There is no automatic device synchronisation.
+- There is no account login.
+- There is no password recovery.
+- There is no server-side backup.
+- Link extraction will not work on every store.
+- Scheduled price tracking is excluded.
+- Remote image URLs may break.
+- Browser-storage capacity varies by device.
+- Private browsing may not preserve data.
 
 These limitations are acceptable because the application avoids recurring storage and backend costs.
 
@@ -4817,39 +4818,38 @@ Download AspireList Deep Master Specification
 
 It includes:
 
-* Complete product requirements  
-* Free local-first architecture  
-* Exact technology stack  
-* IndexedDB and Dexie schema  
-* Full TypeScript data models  
-* Repository contracts  
-* Complete item CRUD  
-* Category and collection CRUD  
-* Transaction and deletion rules  
-* Every route and page  
-* Detailed UI behaviour  
-* Search, filters, sorting and pagination  
-* Image upload and Blob storage  
-* Price and savings calculations  
-* Price history  
-* Duplicate detection  
-* Optional free URL-extraction architecture  
-* JSON backup and restoration  
-* CSV export  
-* Merge and replace restore modes  
-* Validation schemas  
-* Error, loading and empty states  
-* Accessibility requirements  
-* Responsive behaviour  
-* PWA requirements  
-* Security requirements  
-* Testing strategy  
-* Vercel deployment configuration  
-* Ten separate Lovable implementation prompts  
-* Codex prompt for the Cloudflare extraction Worker  
-* Acceptance criteria  
-* Definition of done  
-* Future migration path
+- Complete product requirements
+- Free local-first architecture
+- Exact technology stack
+- IndexedDB and Dexie schema
+- Full TypeScript data models
+- Repository contracts
+- Complete item CRUD
+- Category and collection CRUD
+- Transaction and deletion rules
+- Every route and page
+- Detailed UI behaviour
+- Search, filters, sorting and pagination
+- Image upload and Blob storage
+- Price and savings calculations
+- Price history
+- Duplicate detection
+- Optional free URL-extraction architecture
+- JSON backup and restoration
+- CSV export
+- Merge and replace restore modes
+- Validation schemas
+- Error, loading and empty states
+- Accessibility requirements
+- Responsive behaviour
+- PWA requirements
+- Security requirements
+- Testing strategy
+- Vercel deployment configuration
+- Ten separate Lovable implementation prompts
+- Codex prompt for the Cloudflare extraction Worker
+- Acceptance criteria
+- Definition of done
+- Future migration path
 
 Upload the file to **Lovable Project Knowledge**. Then use the numbered Lovable phase prompts from the document individually, starting with **Phase 1**. Do not ask Lovable to implement all ten phases in one message.
-
