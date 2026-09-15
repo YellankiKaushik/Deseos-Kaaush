@@ -34,6 +34,7 @@ export const SORTS = [
 ] as const;
 
 export type SortValue = (typeof SORTS)[number]["value"];
+export type ViewMode = "grid" | "list";
 
 const PRIORITY_RANK: Record<string, number> = { dream: 0, high: 1, medium: 2, low: 3 };
 
@@ -125,6 +126,7 @@ export function normalizeUrl(url: string | null | undefined) {
   if (!url) return null;
   try {
     const parsed = new URL(url.trim());
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
     parsed.hash = "";
     parsed.hostname = parsed.hostname.replace(/^www\./, "").toLowerCase();
     for (const key of [...parsed.searchParams.keys()]) {
@@ -137,4 +139,33 @@ export function normalizeUrl(url: string | null | undefined) {
   } catch {
     return null;
   }
+}
+
+export function cleanHttpUrl(value: string, label: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      throw new Error(`${label} must start with http:// or https://.`);
+    }
+    return parsed.toString();
+  } catch (error) {
+    if (error instanceof Error && error.message.includes(label)) throw error;
+    throw new Error(`${label} must be a valid http or https URL.`);
+  }
+}
+
+export function itemMatchesSearch(item: Item, term: string) {
+  const needle = term.trim().toLowerCase();
+  if (!needle) return true;
+  return [
+    item.title,
+    item.brand,
+    item.store_name,
+    item.source_domain,
+    item.description,
+    item.reason_for_wanting,
+    item.personal_notes,
+  ].some((value) => value?.toLowerCase().includes(needle));
 }
