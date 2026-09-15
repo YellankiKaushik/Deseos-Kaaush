@@ -47,17 +47,17 @@ import {
   numberOrNull,
   requireUserId,
 } from "@/lib/queries";
-import { formatMoney, priorityLabel, savingsProgress, statusLabel } from "@/lib/aspire";
+import { formatMoney, priorityLabel, savingsProgress, statusLabel } from "@/lib/wishlist";
 
 export const Route = createFileRoute("/_authenticated/items/$id")({
   head: () => ({
     meta: [
-      { title: "Item — AspireList" },
+      { title: "Item — Wishlist" },
       {
         name: "description",
         content: "The full story behind one item on your list: price, plan, and progress.",
       },
-      { property: "og:title", content: "Item — AspireList" },
+      { property: "og:title", content: "Item — Wishlist" },
       {
         property: "og:description",
         content: "The full story behind one item on your list: price, plan, and progress.",
