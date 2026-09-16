@@ -9,6 +9,7 @@ export type ExtractionMeta = {
   confidence: number | null;
   error: string | null;
   warnings: string[];
+  stateLabel?: string | null;
   lastCheckedAt?: string | null;
 };
 

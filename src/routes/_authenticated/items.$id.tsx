@@ -210,16 +210,25 @@ function ItemDetail() {
     mutationFn: async () => {
       const target = item?.canonical_url || item?.source_url;
       if (!target) throw new Error("This item has no link to re-check.");
-      return extract({ data: { url: target } });
+      return extract({ data: { url: target, skipDuplicateCache: true } });
     },
     onSuccess: (result) => {
       setImageCandidates(result.imageCandidates.map((candidate) => candidate.url));
+      const fallbackAttempted = result.diagnostics?.fallbackAttempted;
       const meta: ExtractionMeta = {
         status: result.status,
         method: result.method,
         confidence: result.confidence,
         error: result.errorMessage ?? null,
         warnings: [...new Set([...missingFieldWarnings(result.fieldsFound), ...result.warnings])],
+        stateLabel:
+          result.status === "success" && fallbackAttempted
+            ? "FALLBACK FOUND DETAILS"
+            : result.status === "success"
+              ? "FOUND"
+              : result.status === "partial"
+                ? "FOUND WITH MISSING DETAILS"
+                : "MANUAL FALLBACK REQUIRED",
       };
       const changes: { label: string; from: string; to: string; apply: () => void }[] = [];
       const propose = (

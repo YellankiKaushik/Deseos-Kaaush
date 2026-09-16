@@ -14,7 +14,10 @@ WishList is a TanStack Start application using the current codebase architecture
 - Supabase Postgres stores application data.
 - Supabase Auth handles email/password sessions and Google OAuth.
 - Product URL extraction runs as a TanStack Start server function in `src/lib/extraction/extract.functions.ts`.
-- Server-only parsing and remote image validation live in `src/lib/extraction/extract.server.ts` and `src/lib/extraction/image-import.server.ts`.
+- `src/lib/extraction/extract.server.ts` orchestrates a provider pipeline. The native provider in `native-provider.server.ts` always runs first and parses JSON-LD Product data, Open Graph, Twitter cards, schema.org metadata, HTML metadata, and product-page heuristics while preserving SSRF, redirect, timeout, and response-size protections.
+- `microlink-provider.server.ts` is an optional browser-backed fallback for blocked or insufficient native results. It uses the free Microlink endpoint without requiring an API key; `MICROLINK_API_KEY` may be supplied later as a server-only variable.
+- `merge-results.ts` deterministically merges providers, preserving native structured prices, currency, ratings, reviews, and availability while using fallback metadata for missing product title, description, store, and image candidates.
+- Remote image validation and private-storage import live in `src/lib/extraction/image-import.server.ts`.
 - Secure auth-account deletion is implemented as a server function in `src/lib/account.functions.ts` and requires `SUPABASE_SECRET_KEY`, with `SUPABASE_SERVICE_ROLE_KEY` supported only as a deprecated legacy fallback.
 
 ## Storage

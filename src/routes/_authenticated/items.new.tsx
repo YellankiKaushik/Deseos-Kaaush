@@ -70,14 +70,38 @@ function NewItem() {
 
   const extracting = useMutation({
     mutationFn: (target: string) => extract({ data: { url: target } }),
+    onMutate: () => {
+      setExtractionMeta({
+        status: "reading",
+        method: "reading",
+        confidence: null,
+        error: null,
+        warnings: [],
+        stateLabel: "READING PAGE",
+      });
+    },
     onSuccess: (result) => {
       setImageCandidates(result.imageCandidates.map((candidate) => candidate.url));
+      const fallbackAttempted = result.diagnostics?.fallbackAttempted;
+      const stateLabel =
+        result.status === "success" && fallbackAttempted
+          ? "FALLBACK FOUND DETAILS"
+          : result.status === "success"
+            ? "FOUND"
+            : result.status === "partial" && fallbackAttempted
+              ? "FALLBACK FOUND DETAILS"
+              : result.status === "partial"
+                ? "FOUND WITH MISSING DETAILS"
+                : fallbackAttempted
+                  ? "MANUAL FALLBACK REQUIRED"
+                  : "LIMITED DETAILS FOUND";
       setExtractionMeta({
         status: result.status,
         method: result.method,
         confidence: result.confidence,
         error: result.errorMessage ?? null,
         warnings: [...new Set([...missingFieldWarnings(result.fieldsFound), ...result.warnings])],
+        stateLabel,
       });
       setValues((prev) => ({
         ...prev,
@@ -99,8 +123,10 @@ function NewItem() {
       setShowForm(true);
       if (result.status === "failed") {
         toast.info(
-          "We couldn't read this store automatically. You can still save the link and fill in anything missing.",
+          "We couldn't read this product automatically. The link is saved, and you can fill in anything missing.",
         );
+      } else if (fallbackAttempted) {
+        toast.success("Details found. Have a quick look before saving.");
       } else if (result.status === "partial") {
         toast.info("We found most of it. Check the highlighted missing details.");
       } else {
@@ -115,6 +141,7 @@ function NewItem() {
         confidence: 0,
         error: message,
         warnings: [],
+        stateLabel: "MANUAL FALLBACK REQUIRED",
       });
       setImageCandidates([]);
       setValues((prev) => ({ ...prev, source_url: url }));
@@ -216,6 +243,11 @@ function NewItem() {
                   toast.error("Paste a link first.");
                   return;
                 }
+                if (duplicate) {
+                  toast.info("That link is already in your WishList.");
+                  navigate({ to: "/items/$id", params: { id: duplicate.id } });
+                  return;
+                }
                 extracting.mutate(url.trim());
               }}
               disabled={extracting.isPending}
@@ -257,12 +289,15 @@ function NewItem() {
         {extractionMeta ? (
           <div className="text-muted-foreground space-y-1 text-xs">
             <p>
-              Extraction: {extractionMeta.status} via {extractionMeta.method}
+              Extraction: {extractionMeta.stateLabel ?? extractionMeta.status}
               {extractionMeta.confidence != null
                 ? ` · ${Math.round(extractionMeta.confidence)}% confidence`
                 : ""}
               {extractionMeta.error ? ` — ${extractionMeta.error}` : ""}
             </p>
+            {import.meta.env.DEV && extractionMeta.method !== "reading" ? (
+              <p>Development diagnostics: {extractionMeta.method}</p>
+            ) : null}
             {extractionMeta.warnings.length ? (
               <p>Not found: {extractionMeta.warnings.join(", ")}. Add them below if you like.</p>
             ) : null}

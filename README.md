@@ -10,6 +10,7 @@ outside tooling and has since been made portable around TanStack Start, Vite, Ve
 ## Features
 
 - Save products from different stores with editable extracted details.
+- Use a native-first, optional-fallback metadata pipeline for link-first product saving.
 - Preview extracted product details before saving.
 - Track source URLs, canonical URLs, prices, ratings, availability, and product images.
 - Organize items with categories and many-to-many collections.
@@ -58,6 +59,7 @@ Server-only variables:
 SUPABASE_URL=
 SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SECRET_KEY=
+MICROLINK_API_KEY= # optional; server-only, not required
 ```
 
 `SUPABASE_SECRET_KEY` must be an `sb_secret_...` key from the Supabase dashboard and must never use
@@ -116,8 +118,9 @@ Run:
 npm run test
 ```
 
-Tests cover domain helpers, backup validation, item payload behavior, product metadata extraction,
-ranked product image candidates, retry behavior, and remote image import validation.
+Tests cover domain helpers, backup validation, item payload behavior, provider-based product
+metadata extraction, fallback merge behavior, ranked product image candidates, retry behavior, and
+remote image import validation.
 
 ## Vercel Deployment
 
@@ -137,6 +140,8 @@ The build emits Vercel Build Output API files under `.vercel/output`.
 - User-owned tables use Row Level Security.
 - Item images live in private storage paths scoped by authenticated user ID.
 - Product extraction and remote image import validate URLs and reject private/internal targets.
+- Microlink fallback, when used, receives only the public product URL and never receives Supabase,
+  Google, or session credentials.
 - Extraction is best-effort; CAPTCHA, login walls, JavaScript-only product content, rate limits,
   and anti-bot/CDN blocking can still require manual entry.
 - JSON import rewrites ownership to the current signed-in user.

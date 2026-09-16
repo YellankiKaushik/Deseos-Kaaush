@@ -2,7 +2,7 @@ import { ExternalLink } from "lucide-react";
 import { ItemImage } from "@/components/item-image";
 import { Badge } from "@/components/ui/badge";
 import type { ItemFormValues } from "@/components/item-form";
-import { formatMoney } from "@/lib/wishlist";
+import { domainOf, formatMoney } from "@/lib/wishlist";
 
 type Props = {
   values: ItemFormValues;
@@ -11,8 +11,15 @@ type Props = {
 export function ProductPreview({ values }: Props) {
   const price = values.current_price ? Number(values.current_price) : null;
   const store = [values.brand, values.store_name].filter(Boolean).join(" · ");
+  const sourceDomain = domainOf(values.canonical_url || values.source_url);
 
-  if (!values.title && !values.primary_image_url && !values.store_name && !values.current_price) {
+  if (
+    !values.title &&
+    !values.primary_image_url &&
+    !values.store_name &&
+    !values.current_price &&
+    !sourceDomain
+  ) {
     return null;
   }
 
@@ -40,6 +47,7 @@ export function ProductPreview({ values }: Props) {
           {price != null && Number.isFinite(price) ? (
             <p className="text-lg font-medium">{formatMoney(price, values.currency)}</p>
           ) : null}
+          {sourceDomain ? <p className="text-xs text-muted-foreground">{sourceDomain}</p> : null}
         </div>
       </div>
     </section>

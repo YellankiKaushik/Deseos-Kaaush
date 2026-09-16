@@ -19,6 +19,8 @@ import {
   parseBackup,
 } from "@/lib/backup";
 import { fetchAndExtract, imageCandidatesFromHtml } from "@/lib/extraction/extract.server";
+import { extractWithNativeProvider } from "@/lib/extraction/native-provider.server";
+import { extractWithMicrolinkProvider } from "@/lib/extraction/microlink-provider.server";
 import { EXTRACTION_FIELDS } from "@/lib/extraction/fields";
 import { missingFieldWarnings } from "@/lib/extraction/extraction-ui";
 import {
@@ -375,7 +377,7 @@ describe("product metadata extraction", () => {
         }),
       );
     vi.stubGlobal("fetch", fetchMock);
-    const result = await fetchAndExtract("https://shop.example.com/lamp");
+    const result = await extractWithNativeProvider("https://shop.example.com/lamp");
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(result.title).toBe("Retried Lamp");
   });
@@ -387,8 +389,190 @@ describe("product metadata extraction", () => {
       "fetch",
       vi.fn(async () => Promise.reject(error)),
     );
-    const result = await fetchAndExtract("https://shop.example.com/slow");
+    const result = await extractWithNativeProvider("https://shop.example.com/slow");
     expect(result.errorCode).toBe("timeout");
+  });
+});
+
+describe("product extraction provider architecture", () => {
+  function microlinkSuccess(data: Record<string, unknown>) {
+    return new Response(
+      JSON.stringify({
+        status: "success",
+        statusCode: 200,
+        data,
+      }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    );
+  }
+
+  it("keeps native extraction as the default when it is strong enough", async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          `
+            <link rel="canonical" href="/camera">
+            <meta property="og:site_name" content="Camera Store">
+            <script type="application/ld+json">
+              {"@type":"Product","name":"Native Camera","description":"Compact","image":"https://cdn.example.com/camera.webp","offers":{"@type":"Offer","price":"499","priceCurrency":"USD"}}
+            </script>
+          `,
+          { headers: { "content-type": "text/html" } },
+        ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await fetchAndExtract("https://shop.example.com/camera");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(result.provider).toBe("native");
+    expect(result.title).toBe("Native Camera");
+    expect(result.price).toBe(499);
+  });
+
+  it("uses fallback for a partial native result below the threshold", async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.startsWith("https://api.microlink.io")) {
+        return microlinkSuccess({
+          title: "Threshold Lamp",
+          url: "https://shop.example.com/lamp",
+          image: { url: "https://cdn.example.com/lamp.webp" },
+        });
+      }
+      return new Response(
+        `
+              <link rel="canonical" href="/lamp">
+              <meta property="og:title" content="Threshold Lamp">
+              <meta property="product:price:amount" content="79">
+              <meta property="product:price:currency" content="USD">
+            `,
+        { headers: { "content-type": "text/html" } },
+      );
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await fetchAndExtract("https://shop.example.com/lamp");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result.status).toBe("success");
+    expect(result.diagnostics?.fallbackAttempted).toBe(true);
+    expect(result.imageUrl).toBe("https://cdn.example.com/lamp.webp");
+  });
+
+  it("calls Microlink when native direct access is blocked", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("blocked", { status: 403 }))
+      .mockResolvedValueOnce(
+        microlinkSuccess({
+          title: "Fallback Watch",
+          description: "Browser metadata",
+          url: "https://shop.example.com/watch",
+          publisher: "Shop Example",
+          image: { url: "https://cdn.example.com/watch.avif", width: 1200, height: 1200 },
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await fetchAndExtract("https://shop.example.com/watch");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result.provider).toBe("merged");
+    expect(result.title).toBe("Fallback Watch");
+    expect(result.storeName).toBe("Shop Example");
+    expect(result.imageUrl).toBe("https://cdn.example.com/watch.avif");
+    expect(result.diagnostics?.fallbackAttempted).toBe(true);
+  });
+
+  it("calls fallback after a native timeout", async () => {
+    const error = new Error("aborted");
+    error.name = "AbortError";
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(error)
+      .mockResolvedValueOnce(
+        microlinkSuccess({
+          title: "Slow Store Bag",
+          url: "https://shop.example.com/bag",
+          publisher: "Slow Store",
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await fetchAndExtract("https://shop.example.com/bag");
+    expect(result.title).toBe("Slow Store Bag");
+    expect(result.diagnostics?.fallbackAttempted).toBe(true);
+  });
+
+  it("preserves native structured price when merging fallback metadata", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          `
+            <script type="application/ld+json">
+              {"@type":"Product","name":"Structured Shoes","offers":{"@type":"Offer","price":"1999","priceCurrency":"INR"}}
+            </script>
+          `,
+          { headers: { "content-type": "text/html" } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        microlinkSuccess({
+          title: "Structured Shoes | Store Navigation",
+          description: "Fallback description",
+          url: "https://shop.example.com/shoes",
+          publisher: "Shoe Store",
+          image: { url: "https://cdn.example.com/shoes.webp" },
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await fetchAndExtract("https://shop.example.com/shoes");
+    expect(result.price).toBe(1999);
+    expect(result.currency).toBe("INR");
+    expect(result.imageUrl).toBe("https://cdn.example.com/shoes.webp");
+  });
+
+  it("keeps the native/manual result when Microlink fails", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(`<meta property="og:title" content="Native Only Title">`, {
+          headers: { "content-type": "text/html" },
+        }),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: "fail" }), { status: 500 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await fetchAndExtract("https://shop.example.com/native-only");
+    expect(result.title).toBe("Native Only Title");
+    expect(result.provider).toBe("native");
+    expect(result.diagnostics?.fallbackStatus).toBe("failed");
+  });
+
+  it("keeps the app usable when Microlink quota is exhausted", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("blocked", { status: 403 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ status: "fail", statusCode: 429 }), { status: 429 }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await fetchAndExtract("https://shop.example.com/quota");
+    expect(result.status).toBe("failed");
+    expect(result.errorCode).toBe("blocked");
+    expect(result.diagnostics?.fallbackAttempted).toBe(true);
+  });
+
+  it("parses a Microlink response shape directly", async () => {
+    const fetchImpl = vi.fn(async () =>
+      microlinkSuccess({
+        title: "Direct Microlink Item",
+        description: "Extracted by browser metadata",
+        url: "https://shop.example.com/direct",
+        publisher: "Direct Store",
+        image: { url: "/direct.jpg", width: 800, height: 800 },
+        logo: { url: "/logo.png", width: 64, height: 64 },
+      }),
+    );
+    const result = await extractWithMicrolinkProvider("https://shop.example.com/direct", {
+      fetchImpl: fetchImpl as never,
+    });
+    expect(result.title).toBe("Direct Microlink Item");
+    expect(result.imageUrl).toBe("https://shop.example.com/direct.jpg");
+    expect(result.imageCandidates[0]?.source).toBe("microlink-image");
   });
 });
 
