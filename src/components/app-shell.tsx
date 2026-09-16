@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { BackButton } from "@/components/back-button";
 import { BrandWordmark } from "@/components/brand-wordmark";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -33,6 +34,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const showBack = pathname !== "/dashboard";
   const profileQuery = useQuery({ queryKey: ["profile"], queryFn: fetchProfile });
   const theme = profileQuery.data?.theme ?? "system";
 
@@ -100,6 +102,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/dashboard" aria-label="WishList dashboard">
             <BrandWordmark className="text-xl" />
           </Link>
+          {showBack ? (
+            <div className="hidden border-l border-border/70 pl-3 md:block">
+              <BackButton />
+            </div>
+          ) : null}
 
           <div className="ml-auto flex items-center gap-2">
             <Button asChild size="sm">
@@ -119,7 +126,14 @@ export function AppShell({ children }: { children: ReactNode }) {
         <aside className="hidden w-52 shrink-0 lg:block">
           <div className="sticky top-24">{nav}</div>
         </aside>
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1">
+          {showBack ? (
+            <div className="mb-4 md:hidden">
+              <BackButton />
+            </div>
+          ) : null}
+          {children}
+        </main>
       </div>
     </div>
   );

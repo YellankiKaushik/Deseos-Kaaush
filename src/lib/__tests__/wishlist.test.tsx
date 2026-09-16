@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { ItemForm, emptyItemForm } from "@/components/item-form";
@@ -18,13 +18,21 @@ import {
   itemsToCsv,
   parseBackup,
 } from "@/lib/backup";
-import { imageCandidatesFromHtml } from "@/lib/extract.server";
+import { fetchAndExtract, imageCandidatesFromHtml } from "@/lib/extraction/extract.server";
+import { EXTRACTION_FIELDS } from "@/lib/extraction/fields";
+import { missingFieldWarnings } from "@/lib/extraction/extraction-ui";
 import {
   fetchRemoteImage,
+  importRemoteImageForItem,
   imageImportFallbackResult,
   RemoteImageImportError,
-} from "@/lib/image-import.server";
+} from "@/lib/extraction/image-import.server";
 import { itemPayload } from "@/lib/item-payload";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe("normalizeUrl", () => {
   it("strips tracking params, www, hash, and trailing slash", () => {
@@ -252,6 +260,136 @@ describe("product image extraction", () => {
     );
     expect(images[0]?.url).toBe("https://shop.example.com/large.jpg");
   });
+
+  it("collects lazy candidates and rejects logo-sized images", () => {
+    const images = imageCandidatesFromHtml(
+      `
+        <img class="site-logo" src="/logo.png" width="80" height="40">
+        <img class="product-gallery" data-srcset="/small.jpg 320w, /zoom.jpg 1400w" data-lazy-src="/lazy.jpg" width="900" height="900">
+      `,
+      "https://shop.example.com/item",
+    );
+    expect(images.map((image) => image.url)).toContain("https://shop.example.com/zoom.jpg");
+    expect(images.map((image) => image.url)).not.toContain("https://shop.example.com/logo.png");
+  });
+});
+
+describe("product metadata extraction", () => {
+  function mockHtmlOnce(html: string, init: ResponseInit = {}) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(html, {
+            status: 200,
+            headers: { "content-type": "text/html", ...(init.headers ?? {}) },
+            ...init,
+          }),
+      ),
+    );
+  }
+
+  it("keeps field names canonical between extraction and UI warnings", () => {
+    const fields = Object.fromEntries(EXTRACTION_FIELDS.map(({ key }) => [key, key === "title"]));
+    expect(missingFieldWarnings(fields)).toContain("image");
+    expect(Object.keys(fields)).toContain("imageUrl");
+    expect(Object.keys(fields)).not.toContain("image");
+  });
+
+  it("extracts JSON-LD @graph products, aggregate offers, ratings, canonical URL, and images", async () => {
+    mockHtmlOnce(`
+      <link rel="canonical" href="/products/camera">
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@graph": [{
+            "@type": ["Product", "Thing"],
+            "name": "Graph Camera",
+            "brand": {"name": "Kaaush"},
+            "description": "A compact camera",
+            "image": [{"contentUrl": "/camera-large.webp"}, "/camera-alt.jpg"],
+            "aggregateRating": {"ratingValue": "4.7", "reviewCount": "128"},
+            "offers": {"@type": "AggregateOffer", "lowPrice": "499.99", "highPrice": "699.99", "priceCurrency": "USD", "availability": "https://schema.org/InStock"}
+          }]
+        }
+      </script>
+    `);
+    const result = await fetchAndExtract("https://shop.example.com/item");
+    expect(result.status).toBe("success");
+    expect(result.title).toBe("Graph Camera");
+    expect(result.price).toBe(499.99);
+    expect(result.originalPrice).toBe(699.99);
+    expect(result.currency).toBe("USD");
+    expect(result.rating).toBe(4.7);
+    expect(result.reviewCount).toBe(128);
+    expect(result.canonicalUrl).toBe("https://shop.example.com/products/camera");
+    expect(result.imageCandidates.map((image) => image.url)).toContain(
+      "https://shop.example.com/camera-large.webp",
+    );
+    expect(result.fieldsFound.imageUrl).toBe(true);
+  });
+
+  it("falls back through Open Graph, Twitter, microdata, and visible price heuristics", async () => {
+    mockHtmlOnce(`
+      <meta property="og:title" content="OG Headphones">
+      <meta property="og:description" content="Noise cancelling">
+      <meta property="og:site_name" content="Sound Store">
+      <meta property="og:image:secure_url" content="//cdn.example.com/headphones.jpg">
+      <meta name="twitter:image:src" content="/twitter.jpg">
+      <meta itemprop="priceCurrency" content="INR">
+      <span itemprop="price" content="9999"></span>
+      <h1>Fallback title</h1>
+    `);
+    const result = await fetchAndExtract("https://shop.example.com/headphones");
+    expect(result.title).toBe("OG Headphones");
+    expect(result.description).toBe("Noise cancelling");
+    expect(result.storeName).toBe("Sound Store");
+    expect(result.price).toBe(9999);
+    expect(result.currency).toBe("INR");
+    expect(result.imageUrl).toBe("https://cdn.example.com/headphones.jpg");
+  });
+
+  it("does not crash on malformed JSON-LD and reports no product metadata", async () => {
+    mockHtmlOnce(`<script type="application/ld+json">{ broken</script>`);
+    const result = await fetchAndExtract("https://shop.example.com/broken");
+    expect(result.status).toBe("failed");
+    expect(result.errorCode).toBe("no_product_metadata");
+    expect(result.warnings.join(" ")).toMatch(/malformed|JavaScript/);
+  });
+
+  it("classifies non-HTML responses", async () => {
+    mockHtmlOnce("{}", { headers: { "content-type": "application/json" } });
+    const result = await fetchAndExtract("https://shop.example.com/api");
+    expect(result.status).toBe("failed");
+    expect(result.errorCode).toBe("not_html");
+  });
+
+  it("retries one safe transient HTTP failure", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("slow down", { status: 429 }))
+      .mockResolvedValueOnce(
+        new Response(`<meta property="og:title" content="Retried Lamp">`, {
+          status: 200,
+          headers: { "content-type": "text/html" },
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await fetchAndExtract("https://shop.example.com/lamp");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result.title).toBe("Retried Lamp");
+  });
+
+  it("classifies timeouts", async () => {
+    const error = new Error("aborted");
+    error.name = "AbortError";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Promise.reject(error)),
+    );
+    const result = await fetchAndExtract("https://shop.example.com/slow");
+    expect(result.errorCode).toBe("timeout");
+  });
 });
 
 describe("remote image import validation", () => {
@@ -274,6 +412,78 @@ describe("remote image import validation", () => {
           }),
       }),
     ).rejects.toThrow(/larger than the storage limit/);
+  });
+
+  it("validates image redirects and sends product-page Referer", async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(null, { status: 302, headers: { location: "/final.jpg" } }),
+      )
+      .mockResolvedValueOnce(
+        new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "image/jpeg" } }),
+      );
+    const image = await fetchRemoteImage("https://cdn.example.com/image.jpg", {
+      fetchImpl,
+      referrerUrl: "https://shop.example.com/product",
+    });
+    expect(image.resolvedUrl).toBe("https://cdn.example.com/final.jpg");
+    expect(fetchImpl).toHaveBeenLastCalledWith(
+      "https://cdn.example.com/final.jpg",
+      expect.objectContaining({
+        headers: expect.objectContaining({ Referer: "https://shop.example.com/product" }),
+      }),
+    );
+  });
+
+  it("imports the second candidate when the first image is blocked", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response("blocked", { status: 403 }))
+        .mockResolvedValueOnce(
+          new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "image/webp" } }),
+        ),
+    );
+    const from = vi.fn((table: string) => {
+      if (table === "items") {
+        return {
+          select: () => ({
+            eq: () => ({
+              single: async () => ({
+                data: { id: "item-1", title: "Lamp", image_storage_path: null },
+                error: null,
+              }),
+            }),
+          }),
+          update: () => ({ eq: async () => ({ error: null }) }),
+        };
+      }
+      return {
+        delete: () => ({ eq: async () => ({ error: null }) }),
+        insert: async () => ({ error: null }),
+      };
+    });
+    const supabase = {
+      from,
+      storage: {
+        from: () => ({
+          upload: async () => ({ error: null }),
+          remove: async () => ({ error: null }),
+        }),
+      },
+    };
+    const result = await importRemoteImageForItem({
+      supabase: supabase as never,
+      userId: "user-1",
+      itemId: "item-1",
+      imageUrl: "https://cdn.example.com/blocked.jpg",
+      imageUrls: ["https://cdn.example.com/ok.webp"],
+      referrerUrl: "https://shop.example.com/product",
+      altText: "Lamp",
+    });
+    expect(result.sourceUrl).toBe("https://cdn.example.com/ok.webp");
   });
 
   it("returns a non-throwing fallback result when remote import fails", () => {

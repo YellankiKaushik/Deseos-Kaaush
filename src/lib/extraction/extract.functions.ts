@@ -24,8 +24,13 @@ export const extractProduct = createServerFn({ method: "POST" })
       status: result.status,
       method: result.method,
       fields_found: result.fieldsFound,
-      error_code: result.errorCode ?? null,
-      error_message: result.errorMessage ?? null,
+      error_code:
+        result.errorCode ??
+        (result.warnings.some((warning) => warning.toLowerCase().includes("image"))
+          ? "image_only_warning"
+          : null),
+      error_message:
+        result.errorMessage ?? (result.warnings.length ? result.warnings.join("; ") : null),
       duration_ms: duration,
     });
 
@@ -38,6 +43,8 @@ export const importRemoteItemImage = createServerFn({ method: "POST" })
     (input: {
       itemId: string;
       imageUrl: string;
+      imageCandidates?: string[] | null;
+      productPageUrl?: string | null;
       altText?: string | null;
       existingWarnings?: string[] | null;
     }) => {
@@ -51,6 +58,14 @@ export const importRemoteItemImage = createServerFn({ method: "POST" })
       return {
         itemId: input.itemId.trim(),
         imageUrl: input.imageUrl.trim(),
+        imageCandidates: Array.isArray(input.imageCandidates)
+          ? input.imageCandidates
+              .filter((url): url is string => typeof url === "string" && url.trim().length > 0)
+              .map((url) => url.trim())
+              .slice(0, 5)
+          : [],
+        productPageUrl:
+          typeof input.productPageUrl === "string" ? input.productPageUrl.trim() : null,
         altText: typeof input.altText === "string" ? input.altText.trim() : null,
         existingWarnings: Array.isArray(input.existingWarnings) ? input.existingWarnings : [],
       };
@@ -66,6 +81,8 @@ export const importRemoteItemImage = createServerFn({ method: "POST" })
           userId: context.userId,
           itemId: data.itemId,
           imageUrl: data.imageUrl,
+          imageUrls: data.imageCandidates,
+          referrerUrl: data.productPageUrl,
           altText: data.altText ?? "",
         })),
         warnings: data.existingWarnings,

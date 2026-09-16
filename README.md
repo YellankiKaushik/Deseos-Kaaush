@@ -10,6 +10,7 @@ outside tooling and has since been made portable around TanStack Start, Vite, Ve
 ## Features
 
 - Save products from different stores with editable extracted details.
+- Preview extracted product details before saving.
 - Track source URLs, canonical URLs, prices, ratings, availability, and product images.
 - Organize items with categories and many-to-many collections.
 - Track target budgets, amount saved, target purchase dates, and purchase reflections.
@@ -115,8 +116,8 @@ Run:
 npm run test
 ```
 
-Tests cover domain helpers, backup validation, item payload behavior, product image extraction, and
-remote image import validation.
+Tests cover domain helpers, backup validation, item payload behavior, product metadata extraction,
+ranked product image candidates, retry behavior, and remote image import validation.
 
 ## Vercel Deployment
 
@@ -136,6 +137,8 @@ The build emits Vercel Build Output API files under `.vercel/output`.
 - User-owned tables use Row Level Security.
 - Item images live in private storage paths scoped by authenticated user ID.
 - Product extraction and remote image import validate URLs and reject private/internal targets.
+- Extraction is best-effort; CAPTCHA, login walls, JavaScript-only product content, rate limits,
+  and anti-bot/CDN blocking can still require manual entry.
 - JSON import rewrites ownership to the current signed-in user.
 
 ## Backup And Export
@@ -149,7 +152,8 @@ item fields for spreadsheet use.
 ```text
 src/components/          Shared UI and app shell
 src/integrations/        Supabase clients and auth middleware
-src/lib/                 Domain helpers, extraction, images, backup/import
+src/lib/extraction/      Product extraction, extraction server functions, and image import
+src/lib/                 Domain helpers, images, backup/import, queries, and utilities
 src/routes/              TanStack Router routes
 supabase/migrations/     Database, RLS, trigger, and storage setup
 docs/                    Architecture and deployment notes

@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ExternalLink, Loader2, RefreshCw, Trash2 } from "lucide-react";
+import { ExternalLink, Loader2, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -34,9 +34,9 @@ import { ItemForm, emptyItemForm, type ItemFormValues } from "@/components/item-
 import { ItemImage } from "@/components/item-image";
 import type { TablesUpdate } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
-import { extractProduct, importRemoteItemImage } from "@/lib/extract.functions";
+import { extractProduct, importRemoteItemImage } from "@/lib/extraction/extract.functions";
 import { itemPayload, type ExtractionMeta } from "@/lib/item-payload";
-import { missingFieldWarnings } from "@/lib/extraction-ui";
+import { missingFieldWarnings } from "@/lib/extraction/extraction-ui";
 import { removeAllItemImages, syncItemImageMetadata } from "@/lib/images";
 import {
   fetchCategories,
@@ -80,6 +80,7 @@ function ItemDetail() {
     changes: { label: string; from: string; to: string; apply: () => void }[];
   } | null>(null);
   const [pendingExtractionMeta, setPendingExtractionMeta] = useState<ExtractionMeta | null>(null);
+  const [imageCandidates, setImageCandidates] = useState<string[]>([]);
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [actualPrice, setActualPrice] = useState("");
   const [reflection, setReflection] = useState("");
@@ -151,6 +152,8 @@ function ItemDetail() {
           data: {
             itemId: id,
             imageUrl: payload.primary_image_url,
+            imageCandidates,
+            productPageUrl: payload.canonical_url ?? payload.source_url ?? null,
             altText: payload.title,
             existingWarnings: payload.extraction_warnings ?? item?.extraction_warnings ?? [],
           },
@@ -210,6 +213,7 @@ function ItemDetail() {
       return extract({ data: { url: target } });
     },
     onSuccess: (result) => {
+      setImageCandidates(result.imageCandidates.map((candidate) => candidate.url));
       const meta: ExtractionMeta = {
         status: result.status,
         method: result.method,
@@ -338,12 +342,6 @@ function ItemDetail() {
 
   return (
     <div className="space-y-8">
-      <Button asChild variant="ghost" size="sm" className="-ml-2">
-        <Link to="/dashboard">
-          <ArrowLeft className="size-4" /> Back
-        </Link>
-      </Button>
-
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-6">
           <div className="bg-surface aspect-4/3 overflow-hidden rounded-2xl border border-border/70">
@@ -438,9 +436,13 @@ function ItemDetail() {
               </p>
             ) : null}
 
-            {item.source_url ? (
+            {item.source_url || item.canonical_url ? (
               <Button asChild variant="outline" className="w-full">
-                <a href={item.source_url} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={item.canonical_url || item.source_url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   View at store <ExternalLink className="size-4" />
                 </a>
               </Button>

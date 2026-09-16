@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { validateUrl } from "@/lib/extract.server";
+import { validateUrl } from "@/lib/extraction/extract.server";
 
 const IMAGE_BUCKET = "item-images";
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -23,6 +23,7 @@ type FetchRemoteImageOptions = {
   maxBytes?: number;
   timeoutMs?: number;
   maxRedirects?: number;
+  referrerUrl?: string | null;
 };
 
 type FetchedRemoteImage = {
@@ -136,6 +137,7 @@ export async function fetchRemoteImage(
     maxBytes = IMAGE_IMPORT_MAX_BYTES,
     timeoutMs = IMAGE_IMPORT_TIMEOUT_MS,
     maxRedirects = IMAGE_IMPORT_MAX_REDIRECTS,
+    referrerUrl = null,
   }: FetchRemoteImageOptions = {},
 ): Promise<FetchedRemoteImage> {
   const checked = validateUrl(rawUrl);
@@ -147,6 +149,9 @@ export async function fetchRemoteImage(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   let current = checked.url;
   let response: Response | null = null;
+  const checkedReferrer = referrerUrl ? validateUrl(referrerUrl) : null;
+  const referer =
+    checkedReferrer && checkedReferrer.ok ? checkedReferrer.url.toString() : checked.url.origin;
 
   try {
     for (let redirect = 0; redirect <= maxRedirects; redirect += 1) {
@@ -157,7 +162,7 @@ export async function fetchRemoteImage(
           "User-Agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
           Accept: "image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8,*/*;q=0.5",
-          Referer: checked.url.origin,
+          Referer: referer,
         },
       });
 
@@ -216,12 +221,16 @@ export async function importRemoteImageForItem({
   userId,
   itemId,
   imageUrl,
+  imageUrls,
+  referrerUrl,
   altText,
 }: {
   supabase: SupabaseClient<Database>;
   userId: string;
   itemId: string;
   imageUrl: string;
+  imageUrls?: string[];
+  referrerUrl?: string | null;
   altText: string;
 }) {
   const { data: item, error: itemError } = await supabase
@@ -233,7 +242,23 @@ export async function importRemoteImageForItem({
     throw new RemoteImageImportError("item_not_found", "That item could not be found.");
   }
 
-  const image = await fetchRemoteImage(imageUrl);
+  const candidates = [...new Set([imageUrl, ...(imageUrls ?? [])].filter(Boolean))].slice(0, 5);
+  let image: FetchedRemoteImage | null = null;
+  let lastError: unknown = null;
+  for (const candidate of candidates) {
+    try {
+      image = await fetchRemoteImage(candidate, { referrerUrl: referrerUrl ?? null });
+      break;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  if (!image) {
+    throw (
+      lastError ??
+      new RemoteImageImportError("image_import_failed", "No extracted image could be imported.")
+    );
+  }
   const path = `${userId}/${itemId}/remote-${Date.now()}-${crypto.randomUUID()}.${image.extension}`;
   const { error: uploadError } = await supabase.storage
     .from(IMAGE_BUCKET)

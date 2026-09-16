@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ImageOff } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signedImageUrl } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +25,10 @@ export function ItemImage({ storagePath, remoteUrl, alt, className }: Props) {
   const signed = useSignedImage(storagePath);
   const [broken, setBroken] = useState(false);
   const src = storagePath ? signed.data : remoteUrl || null;
+
+  useEffect(() => {
+    setBroken(false);
+  }, [src]);
 
   if (!src || broken || (storagePath && signed.isError)) {
     return (

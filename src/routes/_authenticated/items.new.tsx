@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ItemForm, emptyItemForm, type ItemFormValues } from "@/components/item-form";
-import { extractProduct, importRemoteItemImage } from "@/lib/extract.functions";
+import { ProductPreview } from "@/components/product-preview";
+import { extractProduct, importRemoteItemImage } from "@/lib/extraction/extract.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   fetchCategories,
@@ -19,7 +20,7 @@ import {
 } from "@/lib/queries";
 import { normalizeUrl } from "@/lib/wishlist";
 import { itemPayload, type ExtractionMeta } from "@/lib/item-payload";
-import { missingFieldWarnings } from "@/lib/extraction-ui";
+import { missingFieldWarnings } from "@/lib/extraction/extraction-ui";
 import { syncItemImageMetadata } from "@/lib/images";
 
 export const Route = createFileRoute("/_authenticated/items/new")({
@@ -54,6 +55,7 @@ function NewItem() {
   const [values, setValues] = useState<ItemFormValues>(emptyItemForm);
   const [showForm, setShowForm] = useState(false);
   const [extractionMeta, setExtractionMeta] = useState<ExtractionMeta | null>(null);
+  const [imageCandidates, setImageCandidates] = useState<string[]>([]);
 
   const normalized = useMemo(
     () => normalizeUrl(values.canonical_url || values.source_url || url) ?? "",
@@ -69,6 +71,7 @@ function NewItem() {
   const extracting = useMutation({
     mutationFn: (target: string) => extract({ data: { url: target } }),
     onSuccess: (result) => {
+      setImageCandidates(result.imageCandidates.map((candidate) => candidate.url));
       setExtractionMeta({
         status: result.status,
         method: result.method,
@@ -96,10 +99,10 @@ function NewItem() {
       setShowForm(true);
       if (result.status === "failed") {
         toast.info(
-          "That site didn't share its details. Fill them in below and it'll look just as good.",
+          "We couldn't read this store automatically. You can still save the link and fill in anything missing.",
         );
       } else if (result.status === "partial") {
-        toast.info("Got some details. Check anything that looks off.");
+        toast.info("We found most of it. Check the highlighted missing details.");
       } else {
         toast.success("Details pulled in. Have a quick look before saving.");
       }
@@ -113,6 +116,7 @@ function NewItem() {
         error: message,
         warnings: [],
       });
+      setImageCandidates([]);
       setValues((prev) => ({ ...prev, source_url: url }));
       setShowForm(true);
       toast.info("We couldn't read that page. Add the details by hand below.");
@@ -136,6 +140,8 @@ function NewItem() {
           data: {
             itemId: data.id,
             imageUrl: payload.primary_image_url,
+            imageCandidates,
+            productPageUrl: payload.canonical_url ?? payload.source_url ?? null,
             altText: payload.title,
             existingWarnings: payload.extraction_warnings ?? [],
           },
@@ -253,7 +259,7 @@ function NewItem() {
             <p>
               Extraction: {extractionMeta.status} via {extractionMeta.method}
               {extractionMeta.confidence != null
-                ? ` · ${Math.round(extractionMeta.confidence * 100)}% confidence`
+                ? ` · ${Math.round(extractionMeta.confidence)}% confidence`
                 : ""}
               {extractionMeta.error ? ` — ${extractionMeta.error}` : ""}
             </p>
@@ -277,18 +283,21 @@ function NewItem() {
       </div>
 
       {showForm ? (
-        <div className="bg-card elevated rounded-2xl border border-border/70 p-6">
-          <ItemForm
-            values={values}
-            onChange={setValues}
-            onSubmit={() => saving.mutate()}
-            categories={categoriesQuery.data ?? []}
-            collections={collectionsQuery.data ?? []}
-            itemId={itemId}
-            submitting={saving.isPending}
-            submitLabel="Add to my list"
-          />
-        </div>
+        <>
+          <ProductPreview values={values} />
+          <div className="bg-card elevated rounded-2xl border border-border/70 p-6">
+            <ItemForm
+              values={values}
+              onChange={setValues}
+              onSubmit={() => saving.mutate()}
+              categories={categoriesQuery.data ?? []}
+              collections={collectionsQuery.data ?? []}
+              itemId={itemId}
+              submitting={saving.isPending}
+              submitLabel="Add to my list"
+            />
+          </div>
+        </>
       ) : null}
     </div>
   );
