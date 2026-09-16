@@ -12,12 +12,12 @@ import { fetchAllItemCollections, fetchCollections, requireUserId } from "@/lib/
 export const Route = createFileRoute("/_authenticated/collections/")({
   head: () => ({
     meta: [
-      { title: "Collections — Wishlist" },
+      { title: "Collections — WishList" },
       {
         name: "description",
         content: "Group the things you want into themes, rooms, trips, or seasons.",
       },
-      { property: "og:title", content: "Collections — Wishlist" },
+      { property: "og:title", content: "Collections — WishList" },
       {
         property: "og:description",
         content: "Group the things you want into themes, rooms, trips, or seasons.",

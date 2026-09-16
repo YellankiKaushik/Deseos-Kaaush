@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Wishlist design system — warm, premium, calm.
+ * WishList design system — warm, premium, calm.
  * Cream surfaces, charcoal ink, muted warm-orange accent, taupe supporting tones.
  * All colours are semantic tokens. Never hardcode colours in components.
  */
@@ -44,6 +44,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-brand: var(--brand);
   --color-surface: var(--surface);
   --color-surface-foreground: var(--surface-foreground);
   --color-chart-1: var(--chart-1);
@@ -66,6 +67,7 @@
 
 :root {
   --radius: 0.875rem;
+  --brand: #C86C3D;
 
   --background: oklch(0.973 0.012 84);
   --foreground: oklch(0.262 0.014 55);
@@ -76,7 +78,7 @@
   --popover: oklch(0.988 0.007 84);
   --popover-foreground: oklch(0.262 0.014 55);
 
-  --primary: oklch(0.628 0.132 46);
+  --primary: var(--brand);
   --primary-foreground: oklch(0.985 0.008 84);
 
   --secondary: oklch(0.925 0.013 74);
@@ -99,9 +101,9 @@
 
   --border: oklch(0.888 0.013 74);
   --input: oklch(0.888 0.013 74);
-  --ring: oklch(0.628 0.132 46);
+  --ring: var(--brand);
 
-  --chart-1: oklch(0.628 0.132 46);
+  --chart-1: var(--brand);
   --chart-2: oklch(0.556 0.089 152);
   --chart-3: oklch(0.535 0.016 62);
   --chart-4: oklch(0.72 0.09 70);
@@ -109,7 +111,7 @@
 
   --sidebar: oklch(0.955 0.014 80);
   --sidebar-foreground: oklch(0.262 0.014 55);
-  --sidebar-primary: oklch(0.628 0.132 46);
+  --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: oklch(0.985 0.008 84);
   --sidebar-accent: oklch(0.925 0.013 74);
   --sidebar-accent-foreground: oklch(0.302 0.017 55);
@@ -123,13 +125,14 @@
 }
 
 .dark {
+  --brand: #C86C3D;
   --background: oklch(0.208 0.011 56);
   --foreground: oklch(0.945 0.011 82);
   --card: oklch(0.252 0.013 56);
   --card-foreground: oklch(0.945 0.011 82);
   --popover: oklch(0.252 0.013 56);
   --popover-foreground: oklch(0.945 0.011 82);
-  --primary: oklch(0.682 0.13 48);
+  --primary: var(--brand);
   --primary-foreground: oklch(0.19 0.012 56);
   --secondary: oklch(0.302 0.014 58);
   --secondary-foreground: oklch(0.945 0.011 82);
@@ -145,10 +148,10 @@
   --surface-foreground: oklch(0.945 0.011 82);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.682 0.13 48);
+  --ring: var(--brand);
   --sidebar: oklch(0.235 0.012 56);
   --sidebar-foreground: oklch(0.945 0.011 82);
-  --sidebar-primary: oklch(0.682 0.13 48);
+  --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: oklch(0.19 0.012 56);
   --sidebar-accent: oklch(0.302 0.014 58);
   --sidebar-accent-foreground: oklch(0.945 0.011 82);

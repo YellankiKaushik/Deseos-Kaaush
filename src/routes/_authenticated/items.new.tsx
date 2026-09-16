@@ -25,12 +25,12 @@ import { syncItemImageMetadata } from "@/lib/images";
 export const Route = createFileRoute("/_authenticated/items/new")({
   head: () => ({
     meta: [
-      { title: "Add an item — Wishlist" },
+      { title: "Add an item — WishList" },
       {
         name: "description",
         content: "Paste a link or enter details by hand to add something to your list.",
       },
-      { property: "og:title", content: "Add an item — Wishlist" },
+      { property: "og:title", content: "Add an item — WishList" },
       {
         property: "og:description",
         content: "Paste a link or enter details by hand to add something to your list.",

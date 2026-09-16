@@ -128,7 +128,7 @@ describe("formatMoney", () => {
 });
 
 describe("parseBackup", () => {
-  it("accepts the current Wishlist backup format", () => {
+  it("accepts the current WishList backup format", () => {
     const file = parseBackup(
       JSON.stringify({ format: BACKUP_FORMAT, version: 1, data: { items: [] } }),
     );
@@ -143,7 +143,7 @@ describe("parseBackup", () => {
   it("rejects invalid JSON, wrong format, and unsupported versions", () => {
     expect(() => parseBackup("{")).toThrow(/valid JSON/);
     expect(() => parseBackup(JSON.stringify({ format: "other", version: 1, data: {} }))).toThrow(
-      /Wishlist backup/,
+      /WishList backup/,
     );
     expect(() =>
       parseBackup(JSON.stringify({ format: LEGACY_BACKUP_FORMAT, version: 9, data: {} })),

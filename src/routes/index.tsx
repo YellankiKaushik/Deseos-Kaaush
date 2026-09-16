@@ -11,12 +11,13 @@ import {
   ShieldCheck,
   Tags,
 } from "lucide-react";
+import { BrandWordmark } from "@/components/brand-wordmark";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Wishlist — Save what you want, plan when to buy it" },
+      { title: "WishList — Save what you want, plan when to buy it" },
       {
         name: "description",
         content:
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "Wishlist — Save what you want, plan when to buy it",
+        content: "WishList — Save what you want, plan when to buy it",
       },
       {
         property: "og:description",
@@ -40,7 +41,7 @@ const steps = [
   {
     icon: Link2,
     title: "Paste a link",
-    body: "Add a product URL from almost any store and let Wishlist collect the useful details it can read.",
+    body: "Add a product URL from almost any store and let WishList collect the useful details it can read.",
   },
   {
     icon: ShieldCheck,
@@ -69,8 +70,8 @@ function Landing() {
   return (
     <div className="min-h-screen">
       <header className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5">
-        <a href="#top" className="font-display text-xl">
-          Wishlist
+        <a href="#top" aria-label="WishList home">
+          <BrandWordmark className="text-xl" />
         </a>
         <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
           <a href="#how-it-works" className="hover:text-foreground">
@@ -102,7 +103,7 @@ function Landing() {
               Save anything you want. See it all in one place.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Paste a product link from almost any store. Wishlist collects the useful details, lets
+              Paste a product link from almost any store. WishList collects the useful details, lets
               you organise what you want, track savings, and come back when you're ready to buy.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -173,7 +174,7 @@ function Landing() {
           <div className="max-w-2xl">
             <h2 className="font-display text-3xl">Everything useful, nothing locked away</h2>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Wishlist keeps product details editable and gives you practical structure for deciding
+              WishList keeps product details editable and gives you practical structure for deciding
               what matters, what can wait, and what you already bought.
             </p>
           </div>

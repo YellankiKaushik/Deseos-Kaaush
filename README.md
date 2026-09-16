@@ -1,6 +1,6 @@
-# Wishlist
+# WishList
 
-Wishlist is a private, cross-store wishlist and purchase planning application. Save items manually
+WishList is a private, cross-store wishlist and purchase planning application. Save items manually
 or from product URLs, organize them into categories and collections, track savings, and keep a
 record of what you eventually buy.
 
@@ -79,7 +79,7 @@ reproducible by adding new migration files instead of editing already-applied mi
 
 ## Google OAuth Setup
 
-Wishlist uses `supabase.auth.signInWithOAuth({ provider: "google" })` directly. Configure Google in
+WishList uses `supabase.auth.signInWithOAuth({ provider: "google" })` directly. Configure Google in
 Supabase Auth, then add local and production redirect URLs:
 
 - `http://localhost:8080`

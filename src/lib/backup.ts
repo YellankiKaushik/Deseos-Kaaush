@@ -32,7 +32,7 @@ const REPLACE_DELETE_ORDER = [
   "collections",
 ] as const;
 
-/** Throws a readable error when the file isn't a Wishlist backup we understand. */
+/** Throws a readable error when the file isn't a WishList backup we understand. */
 export function parseBackup(raw: string): BackupFile {
   let parsed: unknown;
   try {
@@ -40,10 +40,10 @@ export function parseBackup(raw: string): BackupFile {
   } catch {
     throw new Error("That file isn't valid JSON.");
   }
-  if (!parsed || typeof parsed !== "object") throw new Error("That file isn't a Wishlist backup.");
+  if (!parsed || typeof parsed !== "object") throw new Error("That file isn't a WishList backup.");
   const file = parsed as Partial<BackupFile>;
   if (file.format !== BACKUP_FORMAT && file.format !== LEGACY_BACKUP_FORMAT) {
-    throw new Error("That file isn't a Wishlist backup.");
+    throw new Error("That file isn't a WishList backup.");
   }
   if (file.version !== 1)
     throw new Error(`Backup version ${String(file.version)} isn't supported.`);
@@ -125,7 +125,7 @@ export async function importUserData(
   const summary: ImportSummary = [];
 
   if (mode === "replace" && options.replaceConfirmation !== "REPLACE") {
-    throw new Error("Type REPLACE to replace your current Wishlist data.");
+    throw new Error("Type REPLACE to replace your current WishList data.");
   }
 
   const settings = file.data["settings"] as Record<string, unknown> | null | undefined;

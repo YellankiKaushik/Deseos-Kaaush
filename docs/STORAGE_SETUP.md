@@ -1,6 +1,6 @@
 # Storage Setup
 
-Wishlist uses one private Supabase Storage bucket:
+WishList uses one private Supabase Storage bucket:
 
 ```text
 item-images

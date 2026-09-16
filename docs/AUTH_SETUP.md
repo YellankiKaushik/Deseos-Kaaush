@@ -1,6 +1,6 @@
 # Auth Setup
 
-Wishlist uses Supabase Auth.
+WishList uses Supabase Auth.
 
 ## Email And Password
 

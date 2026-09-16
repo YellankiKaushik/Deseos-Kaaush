@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Wishlist — Save what you want, plan when to buy it" },
+      { title: "WishList — Save what you want, plan when to buy it" },
       {
         name: "description",
         content:

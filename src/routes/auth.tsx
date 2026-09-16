@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { BrandWordmark } from "@/components/brand-wordmark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,15 +15,15 @@ export const Route = createFileRoute("/auth")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign in — Wishlist" },
+      { title: "Sign in — WishList" },
       {
         name: "description",
-        content: "Sign in to your private Wishlist and keep planning what's next.",
+        content: "Sign in to your private WishList and keep planning what's next.",
       },
-      { property: "og:title", content: "Sign in — Wishlist" },
+      { property: "og:title", content: "Sign in — WishList" },
       {
         property: "og:description",
-        content: "Sign in to your private Wishlist and keep planning what's next.",
+        content: "Sign in to your private WishList and keep planning what's next.",
       },
     ],
   }),
@@ -100,8 +101,8 @@ function AuthPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="mx-auto flex h-20 w-full max-w-6xl items-center px-5">
-        <Link to="/" className="font-display text-xl">
-          Wishlist
+        <Link to="/" aria-label="WishList home">
+          <BrandWordmark className="text-xl" />
         </Link>
       </header>
 

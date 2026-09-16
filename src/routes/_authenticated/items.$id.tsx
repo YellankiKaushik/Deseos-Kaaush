@@ -52,12 +52,12 @@ import { formatMoney, priorityLabel, savingsProgress, statusLabel } from "@/lib/
 export const Route = createFileRoute("/_authenticated/items/$id")({
   head: () => ({
     meta: [
-      { title: "Item — Wishlist" },
+      { title: "Item — WishList" },
       {
         name: "description",
         content: "The full story behind one item on your list: price, plan, and progress.",
       },
-      { property: "og:title", content: "Item — Wishlist" },
+      { property: "og:title", content: "Item — WishList" },
       {
         property: "og:description",
         content: "The full story behind one item on your list: price, plan, and progress.",

@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve Wishlist.
+Thanks for helping improve WishList.
 
 ## Local Development
 

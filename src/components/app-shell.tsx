@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { BrandWordmark } from "@/components/brand-wordmark";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { fetchProfile } from "@/lib/queries";
@@ -91,13 +92,13 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-6">
-              <p className="font-display mb-6 text-xl">Wishlist</p>
+              <BrandWordmark className="mb-6 block text-xl" />
               {nav}
             </SheetContent>
           </Sheet>
 
-          <Link to="/dashboard" className="font-display text-xl tracking-tight">
-            Wishlist
+          <Link to="/dashboard" aria-label="WishList dashboard">
+            <BrandWordmark className="text-xl" />
           </Link>
 
           <div className="ml-auto flex items-center gap-2">

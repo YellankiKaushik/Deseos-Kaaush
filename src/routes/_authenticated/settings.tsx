@@ -43,10 +43,10 @@ import { exportUserData, fetchProfile, requireUserId } from "@/lib/queries";
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — Wishlist" },
-      { name: "description", content: "Manage your Wishlist profile, preferences, and data." },
-      { property: "og:title", content: "Settings — Wishlist" },
-      { property: "og:description", content: "Manage your Wishlist profile and data." },
+      { title: "Settings — WishList" },
+      { name: "description", content: "Manage your WishList profile, preferences, and data." },
+      { property: "og:title", content: "Settings — WishList" },
+      { property: "og:description", content: "Manage your WishList profile and data." },
     ],
   }),
   component: Settings,
@@ -171,7 +171,7 @@ function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries();
       setDeleteConfirmation("");
-      toast.success("Your Wishlist data was deleted.");
+      toast.success("Your WishList data was deleted.");
     },
     onError: (error) => toast.error(error instanceof Error ? error.message : "Deletion failed."),
   });
@@ -328,7 +328,7 @@ function Settings() {
           <div>
             <h2 className="font-display text-lg">Danger zone</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              These actions affect only the signed-in account's Wishlist data.
+              These actions affect only the signed-in account's WishList data.
             </p>
           </div>
         </div>
@@ -358,7 +358,7 @@ function Settings() {
                   <AlertDialogTitle>Delete your account?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This removes your auth account through the server and signs you out. It requires
-                    `SUPABASE_SECRET_KEY` to be configured on the server.
+                    a server secret key to be configured.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <Textarea

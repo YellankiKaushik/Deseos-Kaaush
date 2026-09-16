@@ -39,9 +39,9 @@ import { fetchItems, requireUserId } from "@/lib/queries";
 export const Route = createFileRoute("/_authenticated/purchased")({
   head: () => ({
     meta: [
-      { title: "Achieved — Wishlist" },
+      { title: "Achieved — WishList" },
       { name: "description", content: "The archive of everything you set out to get, and got." },
-      { property: "og:title", content: "Achieved — Wishlist" },
+      { property: "og:title", content: "Achieved — WishList" },
       {
         property: "og:description",
         content: "The archive of everything you set out to get, and got.",

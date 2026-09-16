@@ -47,12 +47,12 @@ import {
 export const Route = createFileRoute("/_authenticated/collections/$id")({
   head: () => ({
     meta: [
-      { title: "Collection — Wishlist" },
+      { title: "Collection — WishList" },
       {
         name: "description",
         content: "One theme, its items, its budget, and how far along it is.",
       },
-      { property: "og:title", content: "Collection — Wishlist" },
+      { property: "og:title", content: "Collection — WishList" },
       {
         property: "og:description",
         content: "One theme, its items, its budget, and how far along it is.",

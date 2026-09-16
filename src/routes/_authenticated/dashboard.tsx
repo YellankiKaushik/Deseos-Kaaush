@@ -38,12 +38,12 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Wishlist" },
+      { title: "Dashboard — WishList" },
       {
         name: "description",
         content: "Every item you're working towards, in one calm visual board.",
       },
-      { property: "og:title", content: "Dashboard — Wishlist" },
+      { property: "og:title", content: "Dashboard — WishList" },
       {
         property: "og:description",
         content: "Every item you're working towards, in one calm visual board.",

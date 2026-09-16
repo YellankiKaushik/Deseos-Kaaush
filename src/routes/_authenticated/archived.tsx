@@ -32,9 +32,9 @@ import { fetchItems, requireUserId } from "@/lib/queries";
 export const Route = createFileRoute("/_authenticated/archived")({
   head: () => ({
     meta: [
-      { title: "Archived — Wishlist" },
+      { title: "Archived — WishList" },
       { name: "description", content: "Items you've set aside without deleting them." },
-      { property: "og:title", content: "Archived — Wishlist" },
+      { property: "og:title", content: "Archived — WishList" },
       { property: "og:description", content: "Items you've set aside without deleting them." },
     ],
   }),

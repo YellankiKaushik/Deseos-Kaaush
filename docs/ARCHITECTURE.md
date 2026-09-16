@@ -1,6 +1,6 @@
 # Architecture
 
-Wishlist is a TanStack Start application using the current codebase architecture.
+WishList is a TanStack Start application using the current codebase architecture.
 
 ## Frontend
 
