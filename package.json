@@ -90,11 +90,11 @@
     "vite": "^8.1.5",
     "vitest": "^4.1.10"
   },
-  "description": "A private, cross-store wishlist and purchase planning application",
+  "description": "A self-hostable private wishlist and purchase planning application",
   "author": "Yellanki Kaushik",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YellankiKaushik/Deseos-Kaaush.git"
+    "url": "https://github.com/YellankiKaushik/wishlist.git"
   }
 }

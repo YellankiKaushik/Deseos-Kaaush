@@ -1,34 +1,85 @@
 # Architecture
 
-WishList is a TanStack Start application using the current codebase architecture.
+WishList is provider-neutral application code. Each self-hosted installation supplies its own
+Supabase project, auth settings, storage bucket, and Vercel deployment.
 
 ## Frontend
 
-- `src/routes` contains TanStack Router file routes.
-- `src/components` contains the app shell, item forms, item image UI, cards, and Radix UI primitives.
-- `src/lib/wishlist.ts` contains domain helpers for status labels, sorting, savings progress, URL normalization, and currency totals.
-- `src/lib/queries.ts` contains shared Supabase reads and user-data export.
+- React 19 and TypeScript.
+- TanStack Start and TanStack Router in `src/routes`.
+- TanStack Query for client data workflows.
+- Shared UI and app shell in `src/components`.
+- Domain helpers in `src/lib/wishlist.ts`.
+- Shared Supabase reads and export helpers in `src/lib/queries.ts`.
 
-## Backend
+Browser-visible environment variables:
 
-- Supabase Postgres stores application data.
-- Supabase Auth handles email/password sessions and Google OAuth.
-- Product URL extraction runs as a TanStack Start server function in `src/lib/extraction/extract.functions.ts`.
-- `src/lib/extraction/extract.server.ts` orchestrates a provider pipeline. The native provider in `native-provider.server.ts` always runs first and parses JSON-LD Product data, Open Graph, Twitter cards, schema.org metadata, HTML metadata, and product-page heuristics while preserving SSRF, redirect, timeout, and response-size protections.
-- `microlink-provider.server.ts` is an optional browser-backed fallback for blocked or insufficient native results. It uses the free Microlink endpoint without requiring an API key; `MICROLINK_API_KEY` may be supplied later as a server-only variable.
-- `merge-results.ts` deterministically merges providers, preserving native structured prices, currency, ratings, reviews, and availability while using fallback metadata for missing product title, description, store, and image candidates.
-- Remote image validation and private-storage import live in `src/lib/extraction/image-import.server.ts`.
-- Secure auth-account deletion is implemented as a server function in `src/lib/account.functions.ts` and requires `SUPABASE_SECRET_KEY`, with `SUPABASE_SERVICE_ROLE_KEY` supported only as a deprecated legacy fallback.
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+These are public by design. They rely on Row Level Security and storage policies for data
+isolation.
+
+## Hosting
+
+WishList is deployed as a Vercel-hosted TanStack Start/Nitro app. `vite.config.ts` uses Nitro's
+`vercel` preset, which emits Vercel Build Output API files under `.vercel/output`.
+
+## Data
+
+Supabase PostgreSQL stores profiles, categories, collections, items, item-collection joins,
+item-image metadata, price history, and extraction logs. Migrations live in
+`supabase/migrations`.
+
+All public application tables enable Row Level Security and scope rows to the authenticated user.
+Additional trigger checks prevent cross-user relationship spoofing.
+
+## Authentication
+
+Supabase Auth handles sessions, email/password authentication, and optional Google OAuth. The app
+uses Supabase client APIs directly and does not store Google client secrets.
 
 ## Storage
 
-Images use the private Supabase Storage bucket `item-images`.
-Paths are scoped as `<user id>/<item id>/<filename>`.
-The browser uploads through the authenticated Supabase client and reads images through signed URLs.
-Remote image import runs server-side through authenticated server functions.
+Supabase Storage stores item images in one private bucket:
 
-## Deployment Shape
+```text
+item-images
+```
 
-The Vite config uses native Vite plugins for React, Tailwind CSS, TanStack Start, and Nitro.
-Production builds use Nitro's Vercel preset and emit Vercel Build Output API files under
-`.vercel/output`.
+Paths are scoped as:
+
+```text
+<auth user id>/<item id>/<filename>
+```
+
+The browser uploads through the authenticated Supabase client and reads private images through
+signed URLs. Server-side remote image import validates public image URLs before storing copies.
+
+## Server-only Boundaries
+
+Server-only variables:
+
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SECRET_KEY`
+- `MICROLINK_API_KEY` when configured.
+
+`SUPABASE_SECRET_KEY` must never be exposed with a `VITE_` prefix. It powers privileged server-side
+operations such as account deletion and can bypass RLS. `SUPABASE_SERVICE_ROLE_KEY` is supported
+only as a deprecated server fallback for older local deployments.
+
+## Product Extraction
+
+Product URL extraction runs as a TanStack Start server function in
+`src/lib/extraction/extract.functions.ts`.
+
+- `native-provider.server.ts` parses JSON-LD Product data, Open Graph, Twitter cards, schema.org
+  metadata, HTML metadata, and product-page hints while preserving SSRF, redirect, timeout, and
+  response-size protections.
+- `microlink-provider.server.ts` is an optional browser-backed metadata fallback. It can make
+  unauthenticated Microlink requests and may use `MICROLINK_API_KEY` when supplied.
+- `merge-results.ts` merges providers deterministically.
+- `image-import.server.ts` validates and imports remote images into private storage when possible.
+
+Extraction remains best-effort and manual editing is always available.

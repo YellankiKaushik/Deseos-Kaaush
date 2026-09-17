@@ -1,6 +1,19 @@
 # Database Setup
 
-Run the SQL migrations in `supabase/migrations` against a Supabase-compatible Postgres project in timestamp order.
+The canonical setup path is [Self-host WishList](./SELF_HOSTING.md). This file is a focused
+database reference.
+
+Apply migrations with the Supabase CLI:
+
+```bash
+npx supabase migration list
+npx supabase db push --dry-run
+npx supabase db push
+npx supabase migration list
+```
+
+The Local and Remote migration versions should match after a successful push. Do not manually
+recreate tables if migrations already define them, and do not edit already-applied migrations.
 
 ## Tables
 

@@ -17,6 +17,7 @@ Use a feature branch for changes. Keep commits focused and avoid rewriting publi
 Run:
 
 ```bash
+npm install
 npm run typecheck
 npm run test
 npm run lint
@@ -32,6 +33,9 @@ if they remain.
 Add Supabase schema changes as new migration files under `supabase/migrations`. Do not edit
 already-applied migrations unless the repository has not published them yet and the maintainer asks
 for it.
+
+Never manually modify an already-applied production schema and then leave the repository without a
+matching migration.
 
 ## Secrets
 

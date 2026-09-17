@@ -1,16 +1,20 @@
 # Deployment
 
-## Required Build
+The canonical deployment guide is [Vercel deployment](./VERCEL_DEPLOYMENT.md). This file remains as
+a short release checklist.
+
+## Required Local Checks
 
 ```bash
 npm install
 npm run typecheck
-npm run lint
 npm run test
+npm run lint
 npm run build
+npm audit
 ```
 
-## Environment Variables
+## Required Environment Variables
 
 Set these on the deployment host:
 
@@ -20,29 +24,21 @@ Set these on the deployment host:
 - `SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SECRET_KEY`
 
-`SUPABASE_SERVICE_ROLE_KEY` is supported only as a deprecated legacy fallback. Prefer an
-`sb_secret_...` key in `SUPABASE_SECRET_KEY`.
+Optional:
 
-Do not set secret, service-role, or other private API keys with `VITE_` prefixes.
+- `MICROLINK_API_KEY`
+
+`SUPABASE_SECRET_KEY` is server-only. Do not set secret, service-role, Google client secret, or other
+private API keys with `VITE_` prefixes.
 
 ## Vercel Notes
 
-The source is a TanStack Start/Nitro app. Production builds are pinned to Nitro's `vercel` preset in
+WishList is a TanStack Start/Nitro app. Production builds use Nitro's `vercel` preset in
 `vite.config.ts`, which emits Vercel Build Output API files under `.vercel/output`.
 
 Recommended Vercel project settings:
 
-- Framework preset: Other, Vite, or TanStack Start if offered by the dashboard.
+- Framework preset: TanStack Start if detected; otherwise Vite/Other.
 - Install command: `npm install`
 - Build command: `npm run build`
-- Output directory: leave empty/default so Vercel can use `.vercel/output`.
-
-## Manual External Setup
-
-1. Create or choose a Supabase project.
-2. Run migrations from `supabase/migrations`.
-3. Configure email/password and Google OAuth providers in Supabase Auth.
-4. Configure local, preview, and production redirect URLs.
-5. Confirm the private `item-images` bucket exists.
-6. Add environment variables to the hosting provider.
-7. Run the verification commands above.
+- Output directory: leave empty/default.

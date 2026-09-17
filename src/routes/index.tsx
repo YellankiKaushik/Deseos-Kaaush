@@ -212,7 +212,7 @@ function Landing() {
                 </a>
                 . Source code is available at{" "}
                 <a
-                  href="https://github.com/YellankiKaushik/Deseos-Kaaush"
+                  href="https://github.com/YellankiKaushik/wishlist"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-medium text-foreground hover:text-primary"
