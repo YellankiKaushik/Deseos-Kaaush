@@ -6,6 +6,12 @@ and keep a record of what you eventually buy.
 
 Deploy your own copy using the [self-hosting guide](./docs/SELF_HOSTING.md).
 
+## Preview
+
+![WishList application preview](./docs/assets/wishlist-preview.png)
+
+> The public landing page of a self-hosted WishList installation.
+
 ## What It Does
 
 WishList gives each installation its own Supabase-backed private wishlist. You can paste product
